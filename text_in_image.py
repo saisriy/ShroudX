@@ -32,6 +32,7 @@ def embed_text_LSB(image_path, text_file, output_path):
     for row in image:
         for pixel in row:
             for channel in range(3):  # Iterate over RGB channels
+                                      # first r then g then b
                 if data_index < message_length:
                     pixel[channel] = (pixel[channel] & 254) | int(binary_message[data_index])  # Use 254 to ensure uint8 range
                     data_index += 1
@@ -69,7 +70,7 @@ def extract_text_LSB(image_path, output_text_file):
     print(f"Extracted message saved as {output_text_file}")
 
          
-             ### level 2 implementation with random key generation
+             ### level 2 implementation with random key generation ###
 
 
 # Function to generate and save a random key
@@ -130,12 +131,15 @@ def extract_text_random(image_path, output_text_file):
     message = "".join(chr(int(binary_message[i:i+8], 2)) for i in range(0, len(binary_message), 8))
     message = message.replace("#####", "")
 
-    # ✅ Ensure UTF-8 encoding when writing the extracted text
+
     with open(output_text_file, "w", encoding="utf-8") as file:
         file.write(message)
     
     print(f"Extracted message saved as {output_text_file}")
 
+
+
+      ### LEVEL 3 IMPLEMENTATION OF IMAGE IN TEXT ###
 
 
 # Compute PSNR
