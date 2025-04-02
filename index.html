@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steganography Web App</title>
+</head>
+<body>
+    <h2>Steganography: Hide & Retrieve Text in Images</h2>
+
+    <h3>Encode Text into Image</h3>
+    <form method="post" enctype="multipart/form-data">
+        <label>Upload Image:</label>
+        <input type="file" name="image" required><br>
+        <label>Upload Text File:</label>
+        <input type="file" name="text" required><br>
+        <button type="submit" name="encode">Encode</button>
+    </form>
+
+    {% if encoded_image_lsb and encoded_image_random %}
+        <h3>Encoded Images:</h3>
+        <p>Normal LSB Method:</p>
+        <img src="{{ encoded_image_lsb }}" width="300"><br>
+        <a href="{{ encoded_image_lsb }}" download>Download Normal LSB Image</a>
+
+        <p>Random LSB Method:</p>
+        <img src="{{ encoded_image_random }}" width="300"><br>
+        <a href="{{ encoded_image_random }}" download>Download Random LSB Image</a>
+    {% endif %}
+
+    <h3>Decode Text from Image</h3>
+    <form method="post" enctype="multipart/form-data">
+        <label>Upload Stego Image:</label>
+        <input type="file" name="stego_image" required><br>
+        <button type="submit" name="decode">Decode</button>
+    </form>
+
+    {% if decoded_text %}
+        <h3>Extracted Text:</h3>
+        <a href="{{ decoded_text }}" download>Download Decoded Text</a>
+    {% endif %}
+
+    <h3>Performace metrics for normal lsb and random lsb</h3>
+
+    {% if metrics %}
+        <h3>Performance Metrics:</h3>
+        <p>PSNR: {{ metrics['psnr'] }} dB</p>
+        <p>SSIM: {{ metrics['ssim'] }}</p>
+        <p>Hamming Distance: {{ metrics['hamming'] }}</p>
+    {% endif %}
+</body>
+</html>
