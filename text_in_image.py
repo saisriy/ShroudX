@@ -132,6 +132,41 @@ def extract_text_random(image_path, output_text_file):
     
     print(f"Extracted message saved as {output_text_file}")
 
+# Compute PSNR
+def compute_psnr(original, stego):
+    mse = np.mean((original - stego) ** 2)
+    if mse == 0:
+        return float('inf')  # No difference
+    max_pixel = 255.0
+    psnr = 20 * np.log10(max_pixel / np.sqrt(mse))
+    return psnr
+
+# Compute SSIM
+def compute_ssim(original, stego):
+    ssim_value = ssim(original, stego, data_range=stego.max() - stego.min(), multichannel=True)
+    return ssim_value
+
+# Compute Hamming Distance
+def compute_hamming_distance(original, stego):
+    original_bits = np.unpackbits(original.flatten())
+    stego_bits = np.unpackbits(stego.flatten())
+    return np.sum(original_bits != stego_bits)
+
+# Evaluate steganography
+def evaluate_steganography(original_image, stego_image):
+    original = cv2.imread(original_image)
+    stego = cv2.imread(stego_image)
+
+    gray_original = cv2.cvtColor(original, cv2.COLOR_BGR2GRAY)
+    gray_stego = cv2.cvtColor(stego, cv2.COLOR_BGR2GRAY)
+
+    psnr_value = compute_psnr(original, stego)
+    ssim_value = compute_ssim(gray_original, gray_stego)
+    hamming_value = compute_hamming_distance(original, stego)
+
+    print(f"PSNR: {psnr_value:.2f} dB")
+    print(f"SSIM: {ssim_value:.4f}")
+    print(f"Hamming Distance: {hamming_value}")
 
 
 
@@ -146,9 +181,12 @@ embed_text_LSB(original_image, text_file, stego_image)
 
 extract_text_LSB(stego_image, decoded_text_file)
 
-
+print("for the LSB technique using rgb least bit manipulation method, the performance metrics are:")
+evaluate_steganography(original_image, stego_image)
 
 embed_text_random(original_image, text_file, stego_image)
 extract_text_random(stego_image, decoded_text_file)
 
+print("for the LSB technique using rgb random bit manipulation method, the performance metrics are:")
+evaluate_steganography(original_image, stego_image)
 
