@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import secrets
 from skimage.metrics import structural_similarity as ssim
+import random
 
 """      ### LEVEL 1 IMPLEMENTATION OF TEXT IN IMAGE STEGANOGRAPHY ###
 
@@ -111,6 +112,7 @@ def embed_text_random(image_path, text_file, output_path):
     print(key)
     return key  # Person A can manually share this with Person B
 
+
 def extract_text_random(image_path, output_text_file, key):
     import cv2
     import numpy as np
@@ -153,6 +155,122 @@ def extract_text_random(image_path, output_text_file, key):
 
     print(f"Message successfully extracted and saved to {output_text_file}")
     return True
+
+
+
+
+
+
+
+
+def embed_text_random_expire(image_path, text_file, output_path, expiry_seconds):
+    import cv2
+    import numpy as np
+    import time
+
+    def generate_key():
+        import random
+        return random.randint(0, 2**31 - 1)
+
+    key = generate_key()
+    image = cv2.imread(image_path)
+    if image is None:
+        print("Error: Could not read image.")
+        return None
+
+    with open(text_file, "r", encoding="utf-8") as file:
+        message = file.read()
+
+    # Convert timestamp and expiry_seconds to 32-bit binary
+    timestamp_bin = format(int(time.time()), '032b')
+    expiry_bin = format(int(expiry_seconds), '032b')
+
+    # Add end marker
+    message += "#####"
+    binary_message = timestamp_bin + expiry_bin + ''.join(format(ord(char), '08b') for char in message)
+
+    if len(binary_message) > image.size:
+        print("Error: Message too long to embed in image.")
+        return None
+
+    # Embed using random pixels with key as seed
+    np.random.seed(key)
+    pixel_indices = np.random.choice(image.size // 3, len(binary_message), replace=False)
+
+    for data_index, bit in enumerate(binary_message):
+        i = pixel_indices[data_index]
+        row = i // image.shape[1]
+        col = i % image.shape[1]
+        channel = data_index % 3
+        image[row, col, channel] = (image[row, col, channel] & 254) | int(bit)
+
+    cv2.imwrite(output_path, image)
+    print(f"Message embedded successfully into {output_path}")
+    print(key)
+    return key
+
+
+
+def extract_text_random_expire(image_path, output_text_file, key):
+    import cv2
+    import numpy as np
+    import time
+
+    image = cv2.imread(image_path)
+    if image is None:
+        print("Error: Could not read image.")
+        return False
+
+    np.random.seed(key)
+    binary_message = ""
+    pixel_indices = np.random.choice(image.size // 3, image.size // 3, replace=False)
+
+    end_marker = "0010001100100011001000110010001100100011"  # Binary of '#####'
+    end_marker_found = False
+
+    for i in pixel_indices:
+        row = i // image.shape[1]
+        col = i % image.shape[1]
+        channel = len(binary_message) % 3
+        binary_message += str(image[row, col, channel] & 1)
+
+        if binary_message.endswith(end_marker):
+            binary_message = binary_message[:-len(end_marker)]
+            end_marker_found = True
+            break
+
+    if not end_marker_found:
+        print("Error: End marker not found. Possibly wrong key or corrupted data.")
+        return False
+
+    try:
+        timestamp_bits = binary_message[:32]
+        expiry_bits = binary_message[32:64]
+        embed_time = int(timestamp_bits, 2)
+        expiry_seconds = int(expiry_bits, 2)
+        current_time = int(time.time())
+
+        if current_time - embed_time > expiry_seconds:
+            print("Error: Message has expired and cannot be extracted.")
+            return False
+
+        binary_message = binary_message[64:]  # Remove timestamp and expiry info
+
+        message = "".join(chr(int(binary_message[i:i+8], 2)) for i in range(0, len(binary_message), 8))
+    except ValueError:
+        print("Error: Binary decoding failed.")
+        return False
+
+    with open(output_text_file, "w", encoding="utf-8") as file:
+        file.write(message)
+
+    print(f"Message successfully extracted and saved to {output_text_file}")
+    return True
+
+
+
+
+
 
 
 
