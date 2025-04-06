@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Evaluate Steganography Metrics</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            text-align: center;
+            padding: 20px;
+        }
+        form {
+            background: white;
+            padding: 20px;
+            display: inline-block;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        input, button {
+            margin: 10px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        table {
+            margin-top: 20px;
+            margin-left: auto;
+            margin-right: auto;
+            border-collapse: collapse;
+            width: 60%;
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #28a745;
+            color: white;
+        }
+        .description {
+            max-width: 800px;
+            margin: 0 auto 30px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: left;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.08);
+        }
+    </style>
+</head>
+<body>
+    <h2>Evaluate Steganographic Metrics</h2>
+
+    <div class="description">
+        <h3>What do these metrics mean?</h3>
+        <ul>
+            <li><strong>PSNR (Peak Signal-to-Noise Ratio):</strong> Measures image quality. Higher is better. Ideal values are typically <strong>above 40 dB</strong>.</li>
+            <li><strong>SSIM (Structural Similarity Index):</strong> Measures similarity between images. Ranges from 0 to 1. Values <strong>closer to 1</strong> indicate better quality.</li>
+            <li><strong>Hamming Distance:</strong> Measures the number of bit differences. Lower values indicate more similarity. Ideal value is <strong>close to 0</strong>.</li>
+        </ul>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+        <label>Upload Original Image:</label><br>
+        <input type="file" name="original_image" required><br>
+        <label>Upload Stego Image:</label><br>
+        <input type="file" name="stego_image" required><br>
+        <button type="submit">Evaluate</button>
+    </form>
+
+    {% if metrics %}
+    <h3>Evaluation Results</h3>
+    <table>
+        <tr>
+            <th>Metric</th>
+            <th>Value</th>
+        </tr>
+        <tr>
+            <td>PSNR</td>
+            <td>{{ metrics.psnr }} dB</td>
+        </tr>
+        <tr>
+            <td>SSIM</td>
+            <td>{{ metrics.ssim }}</td>
+        </tr>
+        <tr>
+            <td>Hamming Distance</td>
+            <td>{{ metrics.hamming }}</td>
+        </tr>
+    </table>
+    {% endif %}
+</body>
+</html>
