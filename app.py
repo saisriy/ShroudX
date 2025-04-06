@@ -15,7 +15,13 @@ def index():
     decoded_text = None
     metrics = {}
     show_metrics_button = False 
-    error_messages = {}   # Store error messages
+    error_messages = {
+        "decode_image": "",
+        "decode_key": "",
+        "decode_random": "",
+        "metrics_error": "",
+        "encode": ""
+    }  # Store error messages
     form_submitted = None 
 
     if request.method == "POST":
@@ -38,14 +44,26 @@ def index():
                 encoded_random_path = os.path.join(OUTPUT_FOLDER, "encoded_random.png")
 
                 try:
-                    text_in_image.embed_text_random(image_path, text_path, encoded_random_path)
+                    expiry_str = request.form.get("expiry_time", "").strip()
+                    try:
+                        expiry_seconds = int(expiry_str) if expiry_str else None
+                    except ValueError:
+                        expiry_seconds = None
+                        error_messages["encode_expiry"] = "Invalid expiry time format."
+
+                    # Embed with expiry if provided
+                    if expiry_seconds:
+                        key = text_in_image.embed_text_random_expire(image_path, text_path, encoded_random_path, expiry_seconds)
+                    else:
+                        key = text_in_image.embed_text_random(image_path, text_path, encoded_random_path)
+
                     encoded_image_random = encoded_random_path
                 except ValueError as e:
                     error_messages["encode_random"] = str(e)
 
         elif "decode" in request.form:
             form_submitted = "decode"
-            image_file = request.files["stego_image"]
+            image_file = request.files.get("stego_image")
             key_str = request.form.get("secret_key", "").strip()
 
             if not image_file:
@@ -58,26 +76,22 @@ def index():
                     key = int(key_str)
                 except ValueError as e:
                     error_messages["decode_key"] = f"Invalid key format: {e}"
-                    key = None  # So we don’t proceed with invalid key
+                    key = None
 
-            if image_file and key is not None:
+            # Only try to decode if both image and valid key are provided
+            if image_file and key_str and key is not None:
                 image_path = os.path.join(UPLOAD_FOLDER, image_file.filename)
                 image_file.save(image_path)
 
                 decoded_text_path = os.path.join(OUTPUT_FOLDER, "decoded.txt")
+                result = text_in_image.extract_text_random_expire(image_path, decoded_text_path, key)
 
-                try:
-                    key = int(key_str)
-                    result = text_in_image.extract_text_random(image_path, decoded_text_path, key)
-                    if result is False:  # We'll update the function to return False on failure
-                        error_messages["decode_random"] = "Incorrect key or corrupted image. Please try again."
-                    else:
-                        decoded_text = decoded_text_path
-                except ValueError as e:
-                    error_messages["decode_random"] = str(e)
+                if result is False:
+                    error_messages["decode_random"] = "Message expired or invalid stego image/key."
+                else:
+                    decoded_text = decoded_text_path
 
-
-                # Optional metrics evaluation
+                # Optional: Evaluate metrics if original image and text were provided
                 original_image = request.form.get("original_image", "").strip()
                 original_text = request.form.get("original_text", "").strip()
                 
@@ -90,7 +104,8 @@ def index():
                     except Exception as e:
                         error_messages["metrics_error"] = f"Error during evaluation: {e}"
 
-                show_metrics_button = True 
+                show_metrics_button = True
+        pass
 
     return render_template(
         "index.html", 
