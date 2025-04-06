@@ -15,6 +15,11 @@
         h2, h3 {
             color: #333;
         }
+        .top-right {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
         form {
             background: white;
             padding: 20px;
@@ -68,6 +73,12 @@
     </style>
 </head>
 <body>
+    <div class="top-right">
+        <form action="/evaluate" method="get">
+            <button type="submit">Evaluate Metrics</button>
+        </form>
+    </div>
+
     <h2>Steganography: Hide & Retrieve Text in Images</h2>
 
     <h3>Encode Text into Image</h3>
@@ -79,6 +90,10 @@
         {% endif %}
         <label>Upload Text File:</label>
         <input type="file" name="text" required><br>
+
+        <label for="expiry_time">Set Expiry Time (seconds):</label>
+        <input type="number" name="expiry_time" placeholder="e.g. 60">
+
 
         <button type="submit" name="encode">Encode</button>
         {% if error_messages.encode_text %}
@@ -124,9 +139,7 @@
         <a href="{{ decoded_text }}" download>Download Decoded Text</a>
     {% endif %}
 
-    <form action="/evaluate" method="get">
-        <button type="submit" >Evaluate Metrics</button>
-    </form>
+ 
     
 
 </body>
