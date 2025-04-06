@@ -74,16 +74,22 @@
     <form method="post" enctype="multipart/form-data">
         <label>Upload Image:</label>
         <input type="file" name="image" required><br>
+        {% if error_messages.encode_image %}
+            <div class="error-message" id="encode_image_error">⚠️ {{ error_messages.encode_image }}</div>
+        {% endif %}
         <label>Upload Text File:</label>
         <input type="file" name="text" required><br>
+
         <button type="submit" name="encode">Encode</button>
+        {% if error_messages.encode_text %}
+            <div class="error-message" id="encode_text_error">⚠️ {{ error_messages.encode_text }}</div>
+        {% endif %}
     </form>
 
-    {% if error_message %}
-        <div class="error-message">
-            ⚠️ {{ error_message }}
-        </div>
+    {% if error_messages.encode_random %}
+        <div class="error-message" id="encode_random_error">⚠️ {{ error_messages.encode_random }}</div>
     {% endif %}
+
 
     {% if encoded_image_random %}
         <h3>Encoded Image:</h3>
@@ -96,23 +102,32 @@
     <form method="post" enctype="multipart/form-data">
         <label>Upload Stego Image:</label>
         <input type="file" name="stego_image" required><br>
+        {% if error_messages.decode_image %}
+            <div class="error-message" id="decode_image_error">⚠️ {{ error_messages.decode_image }}</div>
+        {% endif %}
         <label>Enter Secret Key:</label>
         <input type="text" name="secret_key" placeholder="Enter the key shared with you" required><br>
-        <button type="submit" name="decode">Decode</button>
-    </form>
-    {% if error_message %}
-        <div class="error-message">
-            ⚠️ {{ error_message }}
-        </div>
-    {% endif %}
 
+        <button type="submit" name="decode">Decode</button>
+        {% if error_messages.decode_key %}
+            <div class="error-message" id="decode_key_error">⚠️ {{ error_messages.decode_key }}</div>
+        {% endif %}
+        
+        {% if form_submitted == "decode" and error_messages.decode_random %}
+        <div class="error-message">{{ error_messages.decode_random }}</div>
+        {% endif %}
+
+    </form>
+    
     {% if decoded_text %}
         <h3>Extracted Text:</h3>
         <a href="{{ decoded_text }}" download>Download Decoded Text</a>
     {% endif %}
 
-    <h3>Evaluate Metrics</h3>
-    <button onclick="window.open('/evaluate', '_blank')">Evaluate Metrics</button>
+    <form action="/evaluate" method="get">
+        <button type="submit" >Evaluate Metrics</button>
+    </form>
+    
 
 </body>
 </html>
