@@ -111,16 +111,21 @@ def embed_text_random(image_path, text_file, output_path):
     print(key)
     return key  # Person A can manually share this with Person B
 
-
 def extract_text_random(image_path, output_text_file, key):
     import cv2
     import numpy as np
 
     image = cv2.imread(image_path)
-    np.random.seed(key)
+    if image is None:
+        print("Error: Could not read image.")
+        return False
 
+    np.random.seed(key)
     binary_message = ""
     pixel_indices = np.random.choice(image.size // 3, image.size // 3, replace=False)
+
+    end_marker = "0010001100100011001000110010001100100011"  # Binary for '#####'
+    end_marker_found = False
 
     for i in pixel_indices:
         row = i // image.shape[1]
@@ -128,20 +133,28 @@ def extract_text_random(image_path, output_text_file, key):
         channel = len(binary_message) % 3
         binary_message += str(image[row, col, channel] & 1)
 
-        if binary_message[-40:] == "0010001100100011001000110010001100100011":  # '#####'
-            binary_message = binary_message[:-40]
+        if binary_message.endswith(end_marker):
+            binary_message = binary_message[:-len(end_marker)]
+            end_marker_found = True
             break
+
+    if not end_marker_found:
+        print("Error: Incorrect key or corrupted image.")
+        return False
 
     try:
         message = "".join(chr(int(binary_message[i:i+8], 2)) for i in range(0, len(binary_message), 8))
     except ValueError:
-        print(" Extraction failed. Possibly incorrect key or corrupted data.")
-        return
+        print("Error: Decoding binary to text failed. Possibly corrupted data.")
+        return False
 
     with open(output_text_file, "w", encoding="utf-8") as file:
         file.write(message)
 
-    print(f" Message successfully extracted and saved to {output_text_file}")
+    print(f"Message successfully extracted and saved to {output_text_file}")
+    return True
+
+
 
 # Compute PSNR
 def compute_psnr(original, stego):
