@@ -3,7 +3,7 @@ import numpy as np
 import secrets
 from skimage.metrics import structural_similarity as ssim
 
-       ### LEVEL 1 IMPLEMENTATION OF TEXT IN IMAGE STEGANOGRAPHY ###
+"""      ### LEVEL 1 IMPLEMENTATION OF TEXT IN IMAGE STEGANOGRAPHY ###
 
 # Function to embed text into an image
 def embed_text_LSB(image_path, text_file, output_path):
@@ -41,7 +41,7 @@ def embed_text_LSB(image_path, text_file, output_path):
 
 # Function to extract text from an image
 def extract_text_LSB(image_path, output_text_file):
-    """ Extract hidden text from an image and save it to a file """
+   """ """ Extract hidden text from an image and save it to a file """"""
     image = cv2.imread(image_path)
     binary_message = ""
     
@@ -63,7 +63,7 @@ def extract_text_LSB(image_path, output_text_file):
     with open(output_text_file, "w") as file:
         file.write(message)
     
-    print(f"Extracted message saved as {output_text_file}")
+    print(f"Extracted message saved as {output_text_file}") """
 
              ### level 2 implementation with random key generation
 
@@ -82,34 +82,43 @@ def read_key():
 
 # Function to embed text into an image using random pixel selection
 def embed_text_random(image_path, text_file, output_path):
+    import cv2
+    import numpy as np
+    import secrets
+
     image = cv2.imread(image_path)
-    with open(text_file, "r") as file:
+    with open(text_file, "r", encoding="utf-8") as file:
         message = file.read()
 
-    message += "#####" 
+    message += "#####"
     binary_message = ''.join(format(ord(char), '08b') for char in message)
-    
-    key = generate_key()  
-    np.random.seed(key) 
+
+    key = secrets.randbits(32)
+    np.random.seed(key)
     pixel_indices = np.random.choice(image.size // 3, len(binary_message), replace=False)
 
     data_index = 0
     for i in pixel_indices:
         row = i // image.shape[1]
         col = i % image.shape[1]
-        channel = data_index % 3 
+        channel = data_index % 3
         image[row, col, channel] = (image[row, col, channel] & 254) | int(binary_message[data_index])
         data_index += 1
-        
-    
-    cv2.imwrite(output_path, image)
-    print(f"Message embedded. Key saved in 'stego_key.txt'.")
 
-def extract_text_random(image_path, output_text_file):
+    cv2.imwrite(output_path, image)
+    print(f"Message embedded successfully into {output_path}")
+    print(f"Share this key securely: {key}")
+    print(key)
+    return key  # Person A can manually share this with Person B
+
+
+def extract_text_random(image_path, output_text_file, key):
+    import cv2
+    import numpy as np
+
     image = cv2.imread(image_path)
-    key = read_key() 
-    np.random.seed(key) 
-    
+    np.random.seed(key)
+
     binary_message = ""
     pixel_indices = np.random.choice(image.size // 3, image.size // 3, replace=False)
 
@@ -118,19 +127,21 @@ def extract_text_random(image_path, output_text_file):
         col = i % image.shape[1]
         channel = len(binary_message) % 3
         binary_message += str(image[row, col, channel] & 1)
-        
-        if( len(binary_message) >= 40 and binary_message[-40:] == "0010001100100011001000110010001100100011") :  # '#####' in binary
-            binary_message = binary_message[:-40]  # Remove delimiter before stopping
+
+        if binary_message[-40:] == "0010001100100011001000110010001100100011":  # '#####'
+            binary_message = binary_message[:-40]
             break
 
-    message = "".join(chr(int(binary_message[i:i+8], 2)) for i in range(0, len(binary_message), 8))
-    
+    try:
+        message = "".join(chr(int(binary_message[i:i+8], 2)) for i in range(0, len(binary_message), 8))
+    except ValueError:
+        print(" Extraction failed. Possibly incorrect key or corrupted data.")
+        return
 
-    # Ensure UTF-8 encoding when writing the extracted text
     with open(output_text_file, "w", encoding="utf-8") as file:
         file.write(message)
-    
-    print(f"Extracted message saved as {output_text_file}")
+
+    print(f" Message successfully extracted and saved to {output_text_file}")
 
 # Compute PSNR
 def compute_psnr(original, stego):
@@ -168,6 +179,11 @@ def evaluate_steganography(original_image, stego_image):
     print(f"SSIM: {ssim_value:.4f}")
     print(f"Hamming Distance: {hamming_value}")
 
+    return {
+        "psnr": round(psnr_value, 2),
+        "ssim": round(ssim_value, 4),
+        "hamming": round(hamming_value, 2)
+    }
 
 
 # File paths
@@ -177,7 +193,7 @@ decoded_text_file = "decoded_abc.txt"
 stego_image = "static/outputs/encoded_butter.png"
 
 # Embed and evaluate
-embed_text_LSB(original_image, text_file, stego_image)
+"""embed_text_LSB(original_image, text_file, stego_image)
 
 extract_text_LSB(stego_image, decoded_text_file)
 
@@ -185,8 +201,8 @@ print("for the LSB technique using rgb least bit manipulation method, the perfor
 evaluate_steganography(original_image, stego_image)
 
 embed_text_random(original_image, text_file, stego_image)
-extract_text_random(stego_image, decoded_text_file)
+extract_text_random(stego_image, decoded_text_file,key) 
 
 print("for the LSB technique using rgb random bit manipulation method, the performance metrics are:")
 evaluate_steganography(original_image, stego_image)
-
+"""
