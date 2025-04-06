@@ -4,6 +4,68 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Steganography Web App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        h2, h3 {
+            color: #333;
+        }
+        form {
+            background: white;
+            padding: 20px;
+            margin: 20px auto;
+            display: inline-block;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        input, button {
+            margin: 10px 0;
+            padding: 10px;
+            width: 80%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #218838;
+        }
+        img {
+            margin-top: 10px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+        }
+        a {
+            display: inline-block;
+            margin-top: 10px;
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .output-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            display: inline-block;
+        }
+        .error-message {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
     <h2>Steganography: Hide & Retrieve Text in Images</h2>
@@ -17,12 +79,14 @@
         <button type="submit" name="encode">Encode</button>
     </form>
 
-    {% if encoded_image_lsb and encoded_image_random %}
-        <h3>Encoded Images:</h3>
-        <p>Normal LSB Method:</p>
-        <img src="{{ encoded_image_lsb }}" width="300"><br>
-        <a href="{{ encoded_image_lsb }}" download>Download Normal LSB Image</a>
+    {% if error_message %}
+        <div class="error-message">
+            ⚠️ {{ error_message }}
+        </div>
+    {% endif %}
 
+    {% if encoded_image_random %}
+        <h3>Encoded Image:</h3>
         <p>Random LSB Method:</p>
         <img src="{{ encoded_image_random }}" width="300"><br>
         <a href="{{ encoded_image_random }}" download>Download Random LSB Image</a>
@@ -32,21 +96,23 @@
     <form method="post" enctype="multipart/form-data">
         <label>Upload Stego Image:</label>
         <input type="file" name="stego_image" required><br>
+        <label>Enter Secret Key:</label>
+        <input type="text" name="secret_key" placeholder="Enter the key shared with you" required><br>
         <button type="submit" name="decode">Decode</button>
     </form>
+    {% if error_message %}
+        <div class="error-message">
+            ⚠️ {{ error_message }}
+        </div>
+    {% endif %}
 
     {% if decoded_text %}
         <h3>Extracted Text:</h3>
         <a href="{{ decoded_text }}" download>Download Decoded Text</a>
     {% endif %}
 
-    <h3>Performace metrics for normal lsb and random lsb</h3>
+    <h3>Evaluate Metrics</h3>
+    <button onclick="window.open('/evaluate', '_blank')">Evaluate Metrics</button>
 
-    {% if metrics %}
-        <h3>Performance Metrics:</h3>
-        <p>PSNR: {{ metrics['psnr'] }} dB</p>
-        <p>SSIM: {{ metrics['ssim'] }}</p>
-        <p>Hamming Distance: {{ metrics['hamming'] }}</p>
-    {% endif %}
 </body>
 </html>
