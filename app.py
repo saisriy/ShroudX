@@ -1,10 +1,12 @@
 import os
 from flask import Flask, render_template, request, send_file, jsonify
+from crypto_utils import encrypt, decrypt
+import time 
 
 
 import text_in_image  
 
-import image_in_image  
+import image_in_image2
 
 
 app = Flask(__name__)
@@ -34,9 +36,12 @@ def text_in_image_page():
     form_submitted = None 
     encoded_image_random = None
     key_used = None  
+    embed_time = None
+    decode_time = None
 
     if request.method == "POST":
         if "encode" in request.form:
+            
             form_submitted = "encode"
             image_file = request.files["image"]
             text_file = request.files["text"]
@@ -53,34 +58,41 @@ def text_in_image_page():
                 text_file.save(text_path)
 
                 encoded_random_path = os.path.join(OUTPUT_FOLDER, "encoded_random.png")
+                expiry_str = request.form.get("expiry_time", "").strip()
+
+                
+                try:
+                    expiry_seconds = int(expiry_str) if expiry_str else None
+                except ValueError:
+                    expiry_seconds = None
+                    error_messages["encode_expiry"] = "Invalid expiry time format."
 
                 try:
-                    expiry_str = request.form.get("expiry_time", "").strip()
-                    try:
-                        expiry_seconds = int(expiry_str) if expiry_str else None
-                    except ValueError:
-                        expiry_seconds = None
-                        error_messages["encode_expiry"] = "Invalid expiry time format."
-
-                    # Embed with expiry if provided
+                    start_time = time.time()
                     if expiry_seconds:
-                        key = text_in_image.embed_text_random_expire(image_path, text_path, encoded_random_path, expiry_seconds)
+                        encoded_random_path, key = text_in_image.embed_text_random_expire(image_path, text_path, encoded_random_path, expiry_seconds)
                     else:
-                        key = text_in_image.embed_text_random(image_path, text_path, encoded_random_path)
+                        encoded_random_path, key = text_in_image.embed_text_random(image_path, text_path, encoded_random_path)
+                    end_time = time.time()
+                    embed_time = round(end_time - start_time, 4)
 
                     encoded_image_random = encoded_random_path
-                except ValueError as e:
-                    error_messages["encode_random"] = str(e)
-                try:
-                    encoded_random_path, key_used = text_in_image.embed_text_random_expire(image_path, text_path, encoded_random_path, expiry_seconds)
-                    encoded_image_random = encoded_random_path
+                    key_used = encrypt(str(key), "your-secret-password")
                 except ValueError as ve:
-                    error_message = str(ve)
+                    error_messages["encode_random"] = str(ve)
+                    
 
         elif "decode" in request.form:
             form_submitted = "decode"
             image_file = request.files.get("stego_image")
-            key_str = request.form.get("secret_key", "").strip()
+            encrypted_key_str = request.form.get("secret_key", "").strip()
+            try:
+                key_str = decrypt(encrypted_key_str, "your-secret-password")
+                key = int(key_str)
+            except Exception as e:
+                error_messages["decode_key"] = f"Invalid or corrupted key: {e}"
+                key = None
+
 
             if not image_file:
                 error_messages["decode_image"] = "Please upload a stego image to decode."
@@ -100,8 +112,10 @@ def text_in_image_page():
                 image_file.save(image_path)
 
                 decoded_text_path = os.path.join(OUTPUT_FOLDER, "decoded.txt")
+                start_decode = time.time()
                 result = text_in_image.extract_text_random_expire(image_path, decoded_text_path, key)
-
+                end_decode = time.time()
+                decode_time = round(end_decode - start_decode, 4)
                 if result is False:
                     error_messages["decode_random"] = "Message expired or invalid stego image/key."
                 else:
@@ -131,7 +145,9 @@ def text_in_image_page():
         show_metrics_button=show_metrics_button,
         error_messages=error_messages,
         form_submitted=form_submitted,
-        key_used=key_used 
+        key_used=key_used,
+        embed_time=embed_time,
+        decode_time=decode_time
     )
 
 
@@ -155,12 +171,20 @@ def evaluate():
 
     return render_template("evaluate.html", metrics=metrics)
 
+
 @app.route("/page3", methods=["GET", "POST"])
 def image_in_image_page():
     encoded_image_path = None
     decoded_image_path = None
     error = None
-    key_values = [] 
+    encrypted_key = None
+    embed_time = None
+    decode_time = None
+    encode_error = None
+    decode_error = None
+    time_limit_error = None
+
+    aes_password = "your-secret-password"
 
     if request.method == "POST":
         action = request.form.get("action")
@@ -168,65 +192,101 @@ def image_in_image_page():
         if action == "encode":
             cover_img = request.files.get("cover_image")
             secret_img = request.files.get("secret_image")
+            expiry_time = request.form.get("expiry_time")
 
-            if not cover_img or not secret_img:
-                error = "Both cover and secret images are required."
+            if not cover_img or not secret_img or not expiry_time:
+                encode_error = "Cover image, secret image, and expiry time are required."
             else:
+                try:
+                    expiry_seconds = int(expiry_time)
+                except ValueError:
+                    encode_error = "Expiry time must be a valid integer."
+                    return render_template("page3.html", encode_error=encode_error)
+
                 cover_path = os.path.join(UPLOAD_FOLDER, cover_img.filename)
                 secret_path = os.path.join(UPLOAD_FOLDER, secret_img.filename)
                 stego_path = os.path.join(OUTPUT_FOLDER, "stego_image.png")
-                key_path = os.path.join(OUTPUT_FOLDER, "secret_size_level.txt")
 
                 cover_img.save(cover_path)
                 secret_img.save(secret_path)
 
                 try:
-                    secret_info, level = image_in_image.Start_Encode(cover_path, secret_path, stego_path)
-                    key_values = secret_info + [level]  # store key as list of 5 values
-                    with open(key_path, "w") as f:
-                        f.write(','.join(map(str, key_values)))
+                    start_time = time.time()
+                    secret_info, level,x = image_in_image2.Start_Encode(cover_path, secret_path, stego_path)
+                    end_time = time.time()
+                    embed_time = round(end_time - start_time, 4)
+
+                    # Encrypt [w, h, cw, ch, level, timestamp, expiry]
+                    encode_timestamp = int(time.time())
+                    key_values = secret_info + [level, encode_timestamp, expiry_seconds,x ]
+                    key_string = ','.join(map(str, key_values))
+                    encrypted_key = encrypt(key_string, aes_password)
+
                     encoded_image_path = stego_path
                 except Exception as e:
-                    error = f"Encoding failed: {str(e)}"
-
+                    encode_error = f"Encoding failed: {str(e)}"
 
         elif action == "decode":
             stego_img = request.files.get("stego_image")
-            manual_key_str = request.form.get("manual_key")  # Get text input for key
+            encrypted_key_input = request.form.get("manual_key")
 
-            if not stego_img or not manual_key_str:
-                error = "Stego image and key (5 comma-separated values) are required for decoding."
+            if not stego_img or not encrypted_key_input:
+                decode_error = "Stego image and encrypted key are required for decoding."
             else:
                 stego_path = os.path.join(UPLOAD_FOLDER, stego_img.filename)
                 decoded_path = os.path.join(OUTPUT_FOLDER, "decoded_secret.png")
                 stego_img.save(stego_path)
 
                 try:
-                    # Parse and validate key input
-                    data = list(map(int, manual_key_str.strip().split(',')))
-                    if len(data) != 5:
-                        raise ValueError("Please enter exactly 5 comma-separated integers.")
-                    
+                    decrypted_key = decrypt(encrypted_key_input.strip(), aes_password)
+                    data = list(map(int, decrypted_key.split(',')))
+
+                    if len(data) != 8:
+                        raise ValueError("Decrypted key must contain exactly 7 integers.")
+
                     size = data[:4]
                     level = data[4]
+                    encode_time = data[5]
+                    expiry_seconds = data[6]
+                    x = data[7]
 
-                    # Call decode
-                    image_in_image.DECode_lsb(stego_path, decoded_path, size, level)
+                    current_time = int(time.time())
+                    if current_time - encode_time > expiry_seconds:
+                        time_limit_error = "time limit exceeded"
+                        time_limit_error = "Time limit exceeded"
+                        return render_template(
+                            "page3.html",
+                            encoded_image_path=None,
+                            decoded_image_path=None,
+                            error=None,
+                            encode_error=encode_error,
+                            decode_error=None,
+                            encrypted_key=None,
+                            embed_time=None,
+                            decode_time=None,
+                            time_limit_error=time_limit_error
+                        )
+
+                    start_decode = time.time()
+                    image_in_image2.DECode_lsb(stego_path, decoded_path, size, level,x)
                     decoded_image_path = decoded_path
+                    end_decode = time.time()
+                    decode_time = round(end_decode - start_decode, 4)
                 except Exception as e:
-                    error = f"Decoding failed: {str(e)}"
-
-
-        
+                    decode_error = f"Decoding failed: {str(e)}"
 
     return render_template(
         "page3.html",
         encoded_image_path=encoded_image_path,
         decoded_image_path=decoded_image_path,
         error=error,
-        key_values=key_values
+        encode_error=encode_error,
+        decode_error=decode_error,
+        encrypted_key=encrypted_key,
+        embed_time=embed_time,
+        decode_time=decode_time,
+        time_limit_error = time_limit_error
     )
-
 
 if __name__ == "__main__":
     app.run(debug=True)
