@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steganography Web App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        h2, h3 {
+            color: #333;
+        }
+        .top-right {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        form {
+            background: white;
+            padding: 20px;
+            margin: 20px auto;
+            display: inline-block;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        input, button {
+            margin: 10px 0;
+            padding: 10px;
+            width: 80%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #218838;
+        }
+        img {
+            margin-top: 10px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+        }
+        a {
+            display: inline-block;
+            margin-top: 10px;
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .output-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            display: inline-block;
+        }
+        .error-message {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-right">
+        <form action="/evaluate" method="get">
+            <button type="submit">Evaluate Metrics</button>
+        </form>
+    </div>
+
+    <h2>Steganography: Hide & Retrieve Text in Images</h2>
+
+    <h3>Encode Text into Image</h3>
+    <form method="post" enctype="multipart/form-data">
+        <label>Upload Image:</label>
+        <input type="file" name="image" required><br>
+        {% if error_messages.encode_image %}
+            <div class="error-message" id="encode_image_error">⚠️ {{ error_messages.encode_image }}</div>
+        {% endif %}
+        <label>Upload Text File:</label>
+        <input type="file" name="text" required><br>
+
+        <label for="expiry_time">Set Expiry Time (seconds):</label>
+        <input type="number" name="expiry_time" placeholder="e.g. 60">
+
+
+        <button type="submit" name="encode">Encode</button>
+        {% if error_messages.encode_text %}
+            <div class="error-message" id="encode_text_error">⚠️ {{ error_messages.encode_text }}</div>
+        {% endif %}
+    </form>
+
+    {% if error_messages.encode_random %}
+        <div class="error-message" id="encode_random_error">⚠️ {{ error_messages.encode_random }}</div>
+    {% endif %}
+
+
+    {% if encoded_image_random %}
+        <h3>Encoded Image:</h3>
+        <p>Random LSB Method:</p>
+        <img src="{{ encoded_image_random }}" width="300"><br>
+        <a href="{{ encoded_image_random }}" download>Download Random LSB Image</a>
+        {% if key_used %}
+        <h3>Generated Key (for decoding):</h3>
+        <p style="font-weight: bold; color: #2c3e50;">{{ key_used }}</p>
+{% endif %}
+
+    {% endif %}
+
+    <h3>Decode Text from Image</h3>
+    <form method="post" enctype="multipart/form-data">
+        <label>Upload Stego Image:</label>
+        <input type="file" name="stego_image" required><br>
+        {% if error_messages.decode_image %}
+            <div class="error-message" id="decode_image_error">⚠️ {{ error_messages.decode_image }}</div>
+        {% endif %}
+        <label>Enter Secret Key:</label>
+        <input type="text" name="secret_key" placeholder="Enter the key shared with you" required><br>
+
+        <button type="submit" name="decode">Decode</button>
+        {% if error_messages.decode_key %}
+            <div class="error-message" id="decode_key_error">⚠️ {{ error_messages.decode_key }}</div>
+        {% endif %}
+        
+        {% if form_submitted == "decode" and error_messages.decode_random %}
+        <div class="error-message">{{ error_messages.decode_random }}</div>
+        {% endif %}
+
+    </form>
+    
+    {% if decoded_text %}
+        <h3>Extracted Text:</h3>
+        <a href="{{ decoded_text }}" download>Download Decoded Text</a>
+    {% endif %}
+
+ 
+    
+
+</body>
+</html>
