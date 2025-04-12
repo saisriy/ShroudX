@@ -155,6 +155,78 @@ def evaluate():
 
     return render_template("evaluate.html", metrics=metrics)
 
+@app.route("/page3", methods=["GET", "POST"])
+def image_in_image_page():
+    encoded_image_path = None
+    decoded_image_path = None
+    error = None
+    key_values = [] 
+
+    if request.method == "POST":
+        action = request.form.get("action")
+
+        if action == "encode":
+            cover_img = request.files.get("cover_image")
+            secret_img = request.files.get("secret_image")
+
+            if not cover_img or not secret_img:
+                error = "Both cover and secret images are required."
+            else:
+                cover_path = os.path.join(UPLOAD_FOLDER, cover_img.filename)
+                secret_path = os.path.join(UPLOAD_FOLDER, secret_img.filename)
+                stego_path = os.path.join(OUTPUT_FOLDER, "stego_image.png")
+                key_path = os.path.join(OUTPUT_FOLDER, "secret_size_level.txt")
+
+                cover_img.save(cover_path)
+                secret_img.save(secret_path)
+
+                try:
+                    secret_info, level = image_in_image.Start_Encode(cover_path, secret_path, stego_path)
+                    key_values = secret_info + [level]  # store key as list of 5 values
+                    with open(key_path, "w") as f:
+                        f.write(','.join(map(str, key_values)))
+                    encoded_image_path = stego_path
+                except Exception as e:
+                    error = f"Encoding failed: {str(e)}"
+
+
+        elif action == "decode":
+            stego_img = request.files.get("stego_image")
+            manual_key_str = request.form.get("manual_key")  # Get text input for key
+
+            if not stego_img or not manual_key_str:
+                error = "Stego image and key (5 comma-separated values) are required for decoding."
+            else:
+                stego_path = os.path.join(UPLOAD_FOLDER, stego_img.filename)
+                decoded_path = os.path.join(OUTPUT_FOLDER, "decoded_secret.png")
+                stego_img.save(stego_path)
+
+                try:
+                    # Parse and validate key input
+                    data = list(map(int, manual_key_str.strip().split(',')))
+                    if len(data) != 5:
+                        raise ValueError("Please enter exactly 5 comma-separated integers.")
+                    
+                    size = data[:4]
+                    level = data[4]
+
+                    # Call decode
+                    image_in_image.DECode_lsb(stego_path, decoded_path, size, level)
+                    decoded_image_path = decoded_path
+                except Exception as e:
+                    error = f"Decoding failed: {str(e)}"
+
+
+        
+
+    return render_template(
+        "page3.html",
+        encoded_image_path=encoded_image_path,
+        decoded_image_path=decoded_image_path,
+        error=error,
+        key_values=key_values
+    )
+
 
 if __name__ == "__main__":
     app.run(debug=True)
