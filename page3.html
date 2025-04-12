@@ -3,73 +3,113 @@
 <head>
     <title>Image-in-Image Steganography</title>
 
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        text-align: center;
-        background-color: #f4f4f4;
-        margin: 0;
-        padding: 20px;
-    }
-    h2, h3, h4 {
-        color: #333;
-    }
-    form {
-        background: white;
-        padding: 20px;
-        margin: 20px auto;
-        display: inline-block;
-        border-radius: 10px;
-        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-    }
-    input[type="file"],
-    input[type="text"],
-    input[type="number"],
-    input[type="submit"],
-    button {
-        margin: 10px 0;
-        padding: 10px;
-        width: 80%;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-    }
-    input[type="submit"],
-    button {
-        background: #28a745;
-        color: white;
-        border: none;
-        cursor: pointer;
-    }
-    input[type="submit"]:hover,
-    button:hover {
-        background: #218838;
-    }
-    img {
-        margin-top: 10px;
-        border-radius: 10px;
-        border: 1px solid #ddd;
-    }
-    a {
-        display: inline-block;
-        margin-top: 10px;
-        color: #007bff;
-        text-decoration: none;
-    }
-    a:hover {
-        text-decoration: underline;
-    }
-    .output-section {
-        margin-top: 20px;
-        padding: 20px;
-        background: white;
-        border-radius: 10px;
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-        display: inline-block;
-    }
-    .error-message {
-        color: red;
-        margin-top: 10px;
-    }
+    <style>
+        body {
+            font-family: 'Poppins', 'Lato', 'Segoe UI', sans-serif;
+            text-align: center;
+            background-color: rgb(195, 198, 199);
+            margin: 0;
+            padding: 20px;
+        }
+    
+        h1 {
+            font-size: 60px;
+        }
+    
+        h2 {
+            font-size: 35px;
+        }
+    
+        h3, h4 {
+            color: #222;
+            font-size: 28px;
+        }
+    
+        form {
+            background: white;
+            padding: 20px;
+            margin: 20px auto;
+            display: inline-block;
+            border-radius: 15px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.15);
+        }
+    
+        input[type="file"],
+        input[type="text"],
+        input[type="number"],
+        input[type="submit"],
+        button {
+            margin: 10px 0;
+            padding: 12px;
+            width: 80%;
+            border: 1px solid #ccc;
+            border-radius: 7px;
+            font-family: 'Poppins', 'Lato', 'Segoe UI', sans-serif;
+            font-size: 16px;
+        }
+    
+        input[type="submit"],
+        button {
+            background: #444141;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background 0.3s;
+        }
+    
+        input[type="submit"]:hover,
+        button:hover {
+            background: #2e302e;
+        }
+    
+        img {
+            margin-top: 10px;
+            max-width: 90%;
+            height: auto;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+        }
+    
+        a {
+            display: inline-block;
+            margin-top: 10px;
+            color: #0044cc;
+            font-weight: 500;
+            text-decoration: none;
+        }
+    
+        a:hover {
+            text-decoration: underline;
+        }
+    
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+    
+        .output-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            display: inline-block;
+        }
+    
+        .error-message {
+            color: red;
+            margin-top: 10px;
+            font-weight: 500;
+        }
+    
+        p {
+            font-size: 20px;
+        }
+    </style>
+    
 </style>
 </head>
 <body>
@@ -79,40 +119,63 @@
         <p style="color:red;">{{ error }}</p>
     {% endif %}
 
+    <!-- Encode Form -->
     <form action="/page3" method="post" enctype="multipart/form-data">
         <h3>Encode Image</h3>
         <input type="hidden" name="action" value="encode">
         Cover Image: <input type="file" name="cover_image" required><br>
         Secret Image: <input type="file" name="secret_image" required><br>
+        
+        <label for="expiry_time"> Expiry Time (seconds):</label>
+        <input type="text" id="expiry_time" name="expiry_time" placeholder="e.g., 60">
+        </div>
         <input type="submit" value="Encode">
+        <div>
+        {% if encode_error %}
+            <p style="color: red;">{{ encode_error }}</p>
+        {% endif %}
     </form>
 
     {% if encoded_image_path %}
         <h4>Encoded (Stego) Image:</h4>
         <img src="{{ encoded_image_path }}" width="300"><br>
         <a href="{{ encoded_image_path }}" download>Download Stego Image</a>
-        {% if key_values %}
-            <h4>Key (Save this for decoding):</h4>
-            <p>{{ key_values | join(", ") }}</p>
+
+        {% if encrypted_key %}
+        <h3>Generated Key (for decoding):</h3>
+        <p style="font-weight: bold; color: #2c3e50;">{{ encrypted_key }}</p>
         {% endif %}
 
+        {% if embed_time %}
+        <p><strong> Embed Time:</strong> {{ embed_time }} seconds</p>
+        {% endif %}
     {% endif %}
 
     <hr>
 
+    <!-- Decode Form -->
     <form action="/page3" method="post" enctype="multipart/form-data">
         <h3>Decode Image</h3>
         <input type="hidden" name="action" value="decode">
         Stego Image: <input type="file" name="stego_image" required><br>
-        Enter Key (5 comma-separated values): <input type="text" name="manual_key" placeholder="e.g. 128,128,3,3,2" required><br>
-
+        Enter Key: <input type="text" name="manual_key" placeholder="Paste your key here" required><br>
         <input type="submit" value="Decode">
+        {% if decode_error %}
+            <p style="color: red;">{{ decode_error }}</p>
+        {% endif %}
+    
+        {% if time_limit_error %}
+                <p style="color: red;">{{ time_limit_error }}</p>
+        {% endif %}
     </form>
 
     {% if decoded_image_path %}
         <h4>Decoded Secret Image:</h4>
         <img src="{{ decoded_image_path }}" width="300"><br>
         <a href="{{ decoded_image_path }}" download>Download Secret Image</a>
+    {% endif %}
+    {% if decode_time %}
+        <p><strong> Decode Time:</strong> {{ decode_time }} seconds</p>
     {% endif %}
 </body>
 </html>
