@@ -8,9 +8,11 @@ import text_in_image
 
 import image_in_image2
 
+from audio_in_image import Start_Encode, Start_Decode 
+
 
 app = Flask(__name__)
-UPLOAD_FOLDER = "uploads"
+UPLOAD_FOLDER = "static/uploads"
 OUTPUT_FOLDER = "static/outputs"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(OUTPUT_FOLDER, exist_ok=True)
@@ -151,25 +153,7 @@ def text_in_image_page():
     )
 
 
-@app.route("/evaluate", methods=["GET", "POST"])
-def evaluate():
-    metrics = {}
-    if request.method == "POST":
-        original_image = request.files.get("original_image")
-        stego_image = request.files.get("stego_image")
 
-        if original_image and stego_image:
-            original_path = os.path.join(UPLOAD_FOLDER, original_image.filename)
-            stego_path = os.path.join(UPLOAD_FOLDER, stego_image.filename)
-            original_image.save(original_path)
-            stego_image.save(stego_path)
-
-            try:
-                metrics = text_in_image.evaluate_steganography(original_path, stego_path)
-            except Exception as e:
-                return render_template("evaluate.html", error=str(e))
-
-    return render_template("evaluate.html", metrics=metrics)
 
 
 @app.route("/page3", methods=["GET", "POST"])
@@ -288,5 +272,92 @@ def image_in_image_page():
         time_limit_error = time_limit_error
     )
 
+
+    
+@app.route('/page4', methods=['GET', 'POST'])
+def audio_in_image():
+    result = {}
+    if request.method == 'POST':
+        action = request.form.get("action")
+
+        if action == "encode":
+            audio_file = request.files.get("audio_file")
+            cover_image = request.files.get("cover_image")
+            expiry = request.form.get("expiry_time", "60")  # default to 60s
+
+            if audio_file and cover_image:
+                audio_path = os.path.join(UPLOAD_FOLDER, audio_file.filename)
+                cover_path = os.path.join(UPLOAD_FOLDER, cover_image.filename)
+                stego_path = os.path.join(UPLOAD_FOLDER, "stego_image_audio.png")
+
+                audio_file.save(audio_path)
+                cover_image.save(cover_path)
+
+                try:
+                    start_time = time.time()
+                    key = Start_Encode(audio_path, cover_path, int(expiry), stego_path)
+                    embed_time = round(time.time() - start_time, 2)
+
+                    result.update({
+                        "encoded_image_path": stego_path,
+                        "key": key,
+                        "embed_time": embed_time
+                    })
+                except Exception as e:
+                    result["error"] = f"Encoding failed: {str(e)}"
+
+        elif action == "decode":
+            stego_image = request.files.get("stego_image")
+            key = request.form.get("manual_key")
+
+            if stego_image and key:
+                stego_path = os.path.join("static/uploads", stego_image.filename)
+                retrieved_audio_path = os.path.join("static/uploads", "retrieved_audio.wav")
+                stego_image.save(stego_path)
+
+                try:
+                    key = int(key.strip())
+
+                    start_time = time.time()
+                    success = Start_Decode(stego_path, key, retrieved_audio_path)
+                    decode_time = round(time.time() - start_time, 2)
+
+                    if success:
+                        result.update({
+                            "retrieved_audio_path": retrieved_audio_path,
+                            "decode_time": decode_time
+                        })
+                    else:
+                        result["decode_error"] = "Extraction failed: Possibly expired or wrong key."
+                except Exception as e:
+                    result["decode_error"] = f"Decoding failed: {str(e)}"
+
+    return render_template("page4.html", **result)
+
+
+
+@app.route("/evaluate_im", methods=["GET","POST"])
+def evaluate_im():
+    psnr_value = None
+    hamming_value = None
+    eval_error = None
+
+    if request.method == "POST":
+        original_image = request.files.get("original_image")
+        stego_image = request.files.get("stego_image")
+
+        if original_image and stego_image:
+            original_path = os.path.join(UPLOAD_FOLDER, original_image.filename)
+            stego_path = os.path.join(UPLOAD_FOLDER, stego_image.filename)
+            original_image.save(original_path)
+            stego_image.save(stego_path)
+
+            try:
+                psnr_value = image_in_image2.calculate_psnr_im_im(original_path, stego_path)
+                hamming_value = image_in_image2.hamming_distance(original_path, stego_path)
+            except Exception as e:
+                eval_error = f"Error while evaluating: {str(e)}"
+
+    return render_template("evaluate_im.html", psnr_value=psnr_value, hamming_value=hamming_value, eval_error=eval_error)
 if __name__ == "__main__":
     app.run(debug=True)
