@@ -110,7 +110,7 @@ def embed_text_random(image_path, text_file, output_path):
     print(f"Message embedded successfully into {output_path}")
     print(f"Share this key securely: {key}")
     print(key)
-    return key  # Person A can manually share this with Person B
+    return output_path, key  # Person A can manually share this with Person B
 
 
 def extract_text_random(image_path, output_text_file, key):
@@ -183,7 +183,10 @@ def embed_text_random_expire(image_path, text_file, output_path, expiry_seconds)
 
     # Convert timestamp and expiry_seconds to 32-bit binary
     timestamp_bin = format(int(time.time()), '032b')
-    expiry_bin = format(int(expiry_seconds), '032b')
+    if expiry_seconds == -1:
+        expiry_bin = '1' * 32  # 32-bit flag for no expiry
+    else:
+        expiry_bin = format(int(expiry_seconds), '032b')
 
     # Add end marker
     message += "#####"
@@ -207,7 +210,7 @@ def embed_text_random_expire(image_path, text_file, output_path, expiry_seconds)
     cv2.imwrite(output_path, image)
     print(f"Message embedded successfully into {output_path}")
     print(key)
-    return key
+    return output_path, key
 
 
 
@@ -250,9 +253,10 @@ def extract_text_random_expire(image_path, output_text_file, key):
         expiry_seconds = int(expiry_bits, 2)
         current_time = int(time.time())
 
-        if current_time - embed_time > expiry_seconds:
-            print("Error: Message has expired and cannot be extracted.")
-            return False
+        if expiry_seconds != 2**32 - 1:  # If it's not the "no expiry" flag
+             if current_time - embed_time > expiry_seconds:
+                print("Error: Message has expired and cannot be extracted.")
+                return False
 
         binary_message = binary_message[64:]  # Remove timestamp and expiry info
 
@@ -266,12 +270,6 @@ def extract_text_random_expire(image_path, output_text_file, key):
 
     print(f"Message successfully extracted and saved to {output_text_file}")
     return True
-
-
-
-
-
-
 
 
 # Compute PSNR
