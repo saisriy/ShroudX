@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Audio-in-Image Steganography</title>
+    <style>
+        body {
+            font-family: 'Poppins', 'Lato', 'Segoe UI', sans-serif;
+            text-align: center;
+            background-color: rgb(195, 198, 199);
+            margin: 0;
+            padding: 20px;
+        }
+    
+        h1 {
+            font-size: 60px;
+        }
+    
+        h2 {
+            font-size: 35px;
+        }
+    
+        h3, h4 {
+            color: #222;
+            font-size: 28px;
+        }
+    
+        form {
+            background: white;
+            padding: 20px;
+            margin: 20px auto;
+            display: inline-block;
+            border-radius: 15px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.15);
+        }
+    
+        input[type="file"],
+        input[type="text"],
+        input[type="number"],
+        input[type="submit"],
+        button {
+            margin: 10px 0;
+            padding: 12px;
+            width: 80%;
+            border: 1px solid #ccc;
+            border-radius: 7px;
+            font-family: 'Poppins', 'Lato', 'Segoe UI', sans-serif;
+            font-size: 16px;
+        }
+    
+        input[type="submit"],
+        button {
+            background: #444141;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background 0.3s;
+        }
+    
+        input[type="submit"]:hover,
+        button:hover {
+            background: #2e302e;
+        }
+    
+        img {
+            margin-top: 10px;
+            max-width: 90%;
+            height: auto;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+        }
+    
+        a {
+            display: inline-block;
+            margin-top: 10px;
+            color: #0044cc;
+            font-weight: 500;
+            text-decoration: none;
+        }
+    
+        a:hover {
+            text-decoration: underline;
+        }
+    
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+    
+        .output-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            display: inline-block;
+        }
+    
+        .error-message {
+            color: red;
+            margin-top: 10px;
+            font-weight: 500;
+        }
+    
+        p {
+            font-size: 20px;
+        }
+
+        .evaluate-metrics-wrapper {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+.evaluate-metrics-wrapper button {
+    padding: 10px 20px;
+    background-color: #444141;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-family: 'Poppins', 'Lato', 'Segoe UI', sans-serif;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.evaluate-metrics-wrapper button:hover {
+    background-color: #2e302e;
+}
+
+    </style>
+    
+</head>
+<body>
+    <h2>Audio-in-Image Steganography</h2>
+
+    {% if error %}
+        <p class="error">{{ error }}</p>
+    {% endif %}
+    {% if decode_error %}
+        <p class="error">{{ decode_error }}</p>
+    {% endif %}
+
+    <!-- Encode Form -->
+    <form method="POST" enctype="multipart/form-data">
+        <h3>Encode Audio into Image</h3>
+        <input type="hidden" name="action" value="encode">
+        Audio File: <input type="file" name="audio_file" required><br>
+        Cover Image: <input type="file" name="cover_image" required><br>
+        Expiry Time (seconds): <input type="text" name="expiry_time" placeholder="60"><br>
+        <button type="submit">Encode</button>
+    </form>
+
+    {% if encoded_image_path %}
+    <div class="result-block">
+        <h4>Stego Image:</h4>
+        <img src="{{ encoded_image_path }}" alt="Stego Image"><br>
+        <a href="{{ encoded_image_path }}" download>Download Stego Image</a><br><br>
+
+        <h4>Key:</h4>
+        <p><strong>{{ key }}</strong></p>
+        
+        <p><strong>Embed Time:</strong> {{ embed_time }} seconds</p>
+    </div>
+    {% endif %}
+
+    <hr>
+
+    <!-- Decode Form -->
+    <form method="POST" enctype="multipart/form-data">
+        <h3>Decode Audio from Image</h3>
+        <input type="hidden" name="action" value="decode">
+        Stego Image: <input type="file" name="stego_image" required><br>
+        Key: <input type="text" name="manual_key" placeholder="Enter your key" required><br>
+       
+        <button type="submit">Decode</button>
+    </form>
+
+    {% if retrieved_audio_path %}
+    <div class="result-block">
+        <h4>Retrieved Audio:</h4>
+        <audio controls>
+            <source src="{{ retrieved_audio_path }}" type="audio/wav">
+            Your browser does not support the audio element.
+        </audio><br>
+        <a href="{{ retrieved_audio_path }}" download>Download Audio</a>
+        <p><strong>Decode Time:</strong> {{ decode_time }} seconds</p>
+    </div>
+    {% endif %}
+</body>
+</html>
