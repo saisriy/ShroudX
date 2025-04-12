@@ -1,6 +1,11 @@
 import os
 from flask import Flask, render_template, request, send_file, jsonify
-import text_in_image  # Import your existing script
+
+
+import text_in_image  
+
+import image_in_image  
+
 
 app = Flask(__name__)
 UPLOAD_FOLDER = "uploads"
@@ -8,8 +13,12 @@ OUTPUT_FOLDER = "static/outputs"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/", methods=["GET"])
 def index():
+    return render_template("index.html")
+
+@app.route("/page1", methods=["GET", "POST"])
+def text_in_image_page():
     encoded_image_lsb = None
     encoded_image_random = None
     decoded_text = None
@@ -23,6 +32,8 @@ def index():
         "encode": ""
     }  # Store error messages
     form_submitted = None 
+    encoded_image_random = None
+    key_used = None  
 
     if request.method == "POST":
         if "encode" in request.form:
@@ -60,6 +71,11 @@ def index():
                     encoded_image_random = encoded_random_path
                 except ValueError as e:
                     error_messages["encode_random"] = str(e)
+                try:
+                    encoded_random_path, key_used = text_in_image.embed_text_random_expire(image_path, text_path, encoded_random_path, expiry_seconds)
+                    encoded_image_random = encoded_random_path
+                except ValueError as ve:
+                    error_message = str(ve)
 
         elif "decode" in request.form:
             form_submitted = "decode"
@@ -108,13 +124,14 @@ def index():
         pass
 
     return render_template(
-        "index.html", 
+        "page1.html", 
         encoded_image_random=encoded_image_random, 
         decoded_text=decoded_text,
         metrics=metrics,
         show_metrics_button=show_metrics_button,
         error_messages=error_messages,
-        form_submitted=form_submitted 
+        form_submitted=form_submitted,
+        key_used=key_used 
     )
 
 
@@ -137,6 +154,7 @@ def evaluate():
                 return render_template("evaluate.html", error=str(e))
 
     return render_template("evaluate.html", metrics=metrics)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
