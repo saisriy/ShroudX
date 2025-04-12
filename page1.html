@@ -6,74 +6,136 @@
     <title>Steganography Web App</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Poppins', 'Lato', 'Segoe UI', sans-serif;
             text-align: center;
-            background-color: #f4f4f4;
+            background-color: rgb(195, 198, 199);
             margin: 0;
             padding: 20px;
         }
-        h2, h3 {
-            color: #333;
+    
+        h1 {
+            font-size: 60px;
         }
-        .top-right {
-            position: absolute;
-            top: 20px;
-            right: 20px;
+    
+        h2 {
+            font-size: 35px;
         }
+    
+        h3, h4 {
+            color: #222;
+            font-size: 28px;
+        }
+    
         form {
             background: white;
             padding: 20px;
             margin: 20px auto;
             display: inline-block;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.15);
         }
-        input, button {
+    
+        input[type="file"],
+        input[type="text"],
+        input[type="number"],
+        input[type="submit"],
+        button {
             margin: 10px 0;
-            padding: 10px;
+            padding: 12px;
             width: 80%;
             border: 1px solid #ccc;
-            border-radius: 5px;
+            border-radius: 7px;
+            font-family: 'Poppins', 'Lato', 'Segoe UI', sans-serif;
+            font-size: 16px;
         }
+    
+        input[type="submit"],
         button {
-            background: #28a745;
+            background: #444141;
             color: white;
             border: none;
             cursor: pointer;
+            font-size: 18px;
+            transition: background 0.3s;
         }
+    
+        input[type="submit"]:hover,
         button:hover {
-            background: #218838;
+            background: #2e302e;
         }
+    
         img {
             margin-top: 10px;
+            max-width: 90%;
+            height: auto;
             border-radius: 10px;
             border: 1px solid #ddd;
         }
+    
         a {
             display: inline-block;
             margin-top: 10px;
-            color: #007bff;
+            color: #0044cc;
+            font-weight: 500;
             text-decoration: none;
         }
+    
         a:hover {
             text-decoration: underline;
         }
+    
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+    
         .output-section {
             margin-top: 20px;
             padding: 20px;
             background: white;
-            border-radius: 10px;
+            border-radius: 15px;
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
             display: inline-block;
         }
+    
         .error-message {
             color: red;
             margin-top: 10px;
+            font-weight: 500;
         }
+    
+        p {
+            font-size: 20px;
+        }
+        .evaluate-metrics-wrapper {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+.evaluate-metrics-wrapper button {
+    padding: 10px 20px;
+    background-color: #444141;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-family: 'Poppins', 'Lato', 'Segoe UI', sans-serif;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.evaluate-metrics-wrapper button:hover {
+    background-color: #2e302e;
+}
+
     </style>
+    
 </head>
 <body>
-    <div class="top-right">
+    <div class="evaluate-metrics-wrapper">
         <form action="/evaluate" method="get">
             <button type="submit">Evaluate Metrics</button>
         </form>
@@ -111,6 +173,11 @@
         <p>Random LSB Method:</p>
         <img src="{{ encoded_image_random }}" width="300"><br>
         <a href="{{ encoded_image_random }}" download>Download Random LSB Image</a>
+
+        {% if embed_time %}
+            <p style="margin-top: 10px; font-size: 18px;"><strong>Time taken to embed:</strong> {{ embed_time }} seconds</p>
+        {% endif %}
+
         {% if key_used %}
         <h3>Generated Key (for decoding):</h3>
         <p style="font-weight: bold; color: #2c3e50;">{{ key_used }}</p>
@@ -143,7 +210,9 @@
         <h3>Extracted Text:</h3>
         <a href="{{ decoded_text }}" download>Download Decoded Text</a>
     {% endif %}
-
+    {% if decode_time %}
+        <p><strong>🕒 Decode Time:</strong> {{ decode_time }} seconds</p>
+    {% endif %}
  
     
 
