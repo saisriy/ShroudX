@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image-in-Image Steganography</title>
+</head>
+<body>
+    <h2>Image-in-Image Steganography</h2>
+
+    {% if error %}
+        <p style="color:red;">{{ error }}</p>
+    {% endif %}
+
+    <form action="/page3" method="post" enctype="multipart/form-data">
+        <h3>Encode Image</h3>
+        <input type="hidden" name="action" value="encode">
+        Cover Image: <input type="file" name="cover_image" required><br>
+        Secret Image: <input type="file" name="secret_image" required><br>
+        <input type="submit" value="Encode">
+    </form>
+
+    {% if encoded_image_path %}
+        <h4>Encoded (Stego) Image:</h4>
+        <img src="{{ encoded_image_path }}" width="300"><br>
+        <a href="{{ encoded_image_path }}" download>Download Stego Image</a>
+        {% if key_values %}
+            <h4>Key (Save this for decoding):</h4>
+            <p>{{ key_values | join(", ") }}</p>
+        {% endif %}
+
+    {% endif %}
+
+    <hr>
+
+    <form action="/page3" method="post" enctype="multipart/form-data">
+        <h3>Decode Image</h3>
+        <input type="hidden" name="action" value="decode">
+        Stego Image: <input type="file" name="stego_image" required><br>
+        Enter Key (5 comma-separated values): <input type="text" name="manual_key" placeholder="e.g. 128,128,3,3,2" required><br>
+
+        <input type="submit" value="Decode">
+    </form>
+
+    {% if decoded_image_path %}
+        <h4>Decoded Secret Image:</h4>
+        <img src="{{ decoded_image_path }}" width="300"><br>
+        <a href="{{ decoded_image_path }}" download>Download Secret Image</a>
+    {% endif %}
+</body>
+</html>
