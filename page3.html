@@ -10,6 +10,11 @@
             background-color: rgb(195, 198, 199);
             margin: 0;
             padding: 20px;
+            background-image: url("{{ url_for('static', filename='background.jpeg') }}");
+                background-size: cover;
+                background-repeat: no-repeat;
+                background-attachment: fixed;
+                background-position: center;
         }
     
         h1 {
@@ -108,11 +113,39 @@
         p {
             font-size: 20px;
         }
+
+        .evaluate-metrics-wrapper {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+.evaluate-metrics-wrapper button {
+    padding: 10px 20px;
+    background-color: #444141;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-family: 'Poppins', 'Lato', 'Segoe UI', sans-serif;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.evaluate-metrics-wrapper button:hover {
+    background-color: #2e302e;
+}
+
     </style>
     
-</style>
+
 </head>
 <body>
+    <div class="evaluate-metrics-wrapper">
+        <form action="/evaluate_im" method="get">
+            <button type="submit">Evaluate Metrics</button>
+        </form>
+    </div>
     <h2>Image-in-Image Steganography</h2>
 
     {% if error %}
@@ -167,6 +200,9 @@
         {% if time_limit_error %}
                 <p style="color: red;">{{ time_limit_error }}</p>
         {% endif %}
+        {% if error %}
+        <p style="color: red; margin-top: 10px;">{{ error }}</p>
+    {% endif %}
     </form>
 
     {% if decoded_image_path %}
@@ -177,5 +213,32 @@
     {% if decode_time %}
         <p><strong> Decode Time:</strong> {{ decode_time }} seconds</p>
     {% endif %}
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const encodeForm = document.querySelector('form[action="/page3"][method="post"]');
+            const decodeForm = document.querySelectorAll('form[action="/page3"][method="post"]')[1];
+    
+            const MAX_SIZE_MB = 10;
+            const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
+    
+            function validateFileSize(event) {
+                const files = event.target.querySelectorAll('input[type="file"]');
+                for (let fileInput of files) {
+                    for (let file of fileInput.files) {
+                        if (file.size > MAX_SIZE_BYTES) {
+                            alert(`File size should not exceed ${MAX_SIZE_MB} MB`);
+                            event.preventDefault();
+                            return;
+                        }
+                    }
+                }
+            }
+    
+            encodeForm.addEventListener("submit", validateFileSize);
+            decodeForm.addEventListener("submit", validateFileSize);
+        });
+    </script>
+    
 </body>
 </html>

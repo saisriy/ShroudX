@@ -1,8 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Audio-in-Image Steganography</title>
+    <title>Audio in Image Steganography</title>
     <style>
         body {
             font-family: 'Poppins', 'Lato', 'Segoe UI', sans-serif;
@@ -10,6 +9,11 @@
             background-color: rgb(195, 198, 199);
             margin: 0;
             padding: 20px;
+            background-image: url("{{ url_for('static', filename='background.jpeg') }}");
+                background-size: cover;
+                background-repeat: no-repeat;
+                background-attachment: fixed;
+                background-position: center;
         }
     
         h1 {
@@ -114,81 +118,92 @@
     top: 20px;
     right: 20px;
 }
-
-.evaluate-metrics-wrapper button {
-    padding: 10px 20px;
-    background-color: #444141;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    font-family: 'Poppins', 'Lato', 'Segoe UI', sans-serif;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background 0.3s;
-}
-
-.evaluate-metrics-wrapper button:hover {
-    background-color: #2e302e;
-}
-
-    </style>
-    
+</style>
 </head>
 <body>
+
+    <div class="evaluate-metrics-wrapper">
+        <form action="/evaluate_audio" method="get">
+            <button type="submit">Evaluate Metrics</button>
+        </form>
+    </div>
+
     <h2>Audio-in-Image Steganography</h2>
 
     {% if error %}
-        <p class="error">{{ error }}</p>
-    {% endif %}
-    {% if decode_error %}
-        <p class="error">{{ decode_error }}</p>
+        <p style="color:red;">{{ error }}</p>
     {% endif %}
 
     <!-- Encode Form -->
     <form method="POST" enctype="multipart/form-data">
-        <h3>Encode Audio into Image</h3>
-        <input type="hidden" name="action" value="encode">
-        Audio File: <input type="file" name="audio_file" required><br>
-        Cover Image: <input type="file" name="cover_image" required><br>
-        Expiry Time (seconds): <input type="text" name="expiry_time" placeholder="60"><br>
-        <button type="submit">Encode</button>
+        <h3>Encode Audio</h3>
+        <input type="hidden" name="encode" value="encode">
+        Audio File (WAV): <input type="file" name="audio" accept=".wav" required><br>
+        Cover Image: <input type="file" name="cover_image" accept="image/*" required><br>
+
+        <label for="expiry_time">Expiry Time (seconds):</label>
+        <input type="text" name="expiry_time" placeholder="e.g., 60"><br>
+
+        <input type="submit" value="Encode">
+
+        {% if error_messages.encode_audio %}
+            <p style="color: red;">{{ error_messages.encode_audio }}</p>
+        {% endif %}
+        {% if error_messages.encode_image %}
+            <p style="color: red;">{{ error_messages.encode_image }}</p>
+        {% endif %}
+        {% if error_messages.encode_expiry %}
+            <p style="color: red;">{{ error_messages.encode_expiry }}</p>
+        {% endif %}
     </form>
 
     {% if encoded_image_path %}
-    <div class="result-block">
-        <h4>Stego Image:</h4>
-        <img src="{{ encoded_image_path }}" alt="Stego Image"><br>
-        <a href="{{ encoded_image_path }}" download>Download Stego Image</a><br><br>
+        <h4>Encoded (Stego) Image:</h4>
+        <img src="{{ url_for('static', filename='outputs/' + encoded_image_filename) }}" width="300">
+        <a href="{{ url_for('static', filename='outputs/' + encoded_image_filename) }}" download="audio_stego.png">Download Stego Image</a>
 
-        <h4>Key:</h4>
-        <p><strong>{{ key }}</strong></p>
-        
-        <p><strong>Embed Time:</strong> {{ embed_time }} seconds</p>
-    </div>
+        {% if key_used %}
+            <h3>Generated Key (for decoding):</h3>
+            <p style="font-weight: bold; color: #2c3e50;">{{ key_used }}</p>
+        {% endif %}
+
+        {% if embed_time %}
+            <p><strong>Embed Time:</strong> {{ embed_time }} seconds</p>
+        {% endif %}
     {% endif %}
 
     <hr>
 
     <!-- Decode Form -->
     <form method="POST" enctype="multipart/form-data">
-        <h3>Decode Audio from Image</h3>
-        <input type="hidden" name="action" value="decode">
-        Stego Image: <input type="file" name="stego_image" required><br>
-        Key: <input type="text" name="manual_key" placeholder="Enter your key" required><br>
-       
-        <button type="submit">Decode</button>
+        <h3>Decode Audio</h3>
+        <input type="hidden" name="decode" value="decode">
+        Stego Image: <input type="file" name="stego_image" accept="image/*" required><br>
+        Enter Key: <input type="text" name="secret_key" placeholder="Paste your key here" required><br>
+        <input type="submit" value="Decode">
+
+        {% if error_messages.decode_image %}
+            <p style="color: red;">{{ error_messages.decode_image }}</p>
+        {% endif %}
+        {% if error_messages.decode_key %}
+            <p style="color: red;">{{ error_messages.decode_key }}</p>
+        {% endif %}
+        {% if error_messages.decode_audio %}
+            <p style="color: red;">{{ error_messages.decode_audio }}</p>
+        {% endif %}
     </form>
 
-    {% if retrieved_audio_path %}
-    <div class="result-block">
-        <h4>Retrieved Audio:</h4>
-        <audio controls>
-            <source src="{{ retrieved_audio_path }}" type="audio/wav">
-            Your browser does not support the audio element.
+    {% if decoded_audio_path %}
+        <h4>Decoded Audio:</h4>
+        
         </audio><br>
-        <a href="{{ retrieved_audio_path }}" download>Download Audio</a>
-        <p><strong>Decode Time:</strong> {{ decode_time }} seconds</p>
-    </div>
+        <a href="{{ url_for('static', filename=decoded_audio_path.replace('\\', '/')) }}" download>Download Audio</a>
+         
     {% endif %}
+
+    {% if decode_time %}
+        <p><strong>Decode Time:</strong> {{ decode_time }} seconds</p>
+    {% endif %}
+
 </body>
 </html>

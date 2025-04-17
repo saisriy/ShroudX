@@ -1,66 +1,160 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Lato:wght@300;400;700&family=Segoe+UI&display=swap" rel="stylesheet">
-    <title>Main Page</title>
-    <style>
-        body {
-                font-family: 'Poppins', 'Lato', 'Segoe UI', sans-serif;
-                text-align: center;
-                background-color: rgb(195, 198, 199);
-                margin: 0;
-                
-            }
-        
-        h1 {
-            font-size: 60px;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Lato:wght@300;400;700&family=Segoe+UI&display=swap" rel="stylesheet">
+  <title>Main Page</title>
+  <style>
+    body {
+      font-family: 'Poppins', 'Lato', 'Segoe UI', sans-serif;
+      text-align: center;
+      margin: 0;
+      background-color: rgb(195, 198, 199);
+      background-image: url("{{ url_for('static', filename='background.jpeg') }}");
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      background-position: center;
+    }
+    .help-button {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  width: 35px;
+  height: 35px;
+  font-size: 16px;
+  background-color: #444141;
+  color: white;
+  border: none;
+  
+  cursor: pointer;
+  padding: 0;
+  line-height: 35px;
+}
+.help-button:hover {
+  background-color: #2e302e;
+}
 
-        h2 {
-            font-size: 35px;
-        }
 
-        .container {
-                display: flex;
-                flex-direction: column;
-                align-items: center; /* Center them horizontally */
-                gap: 10px; /* Add spacing between buttons */
-            }
+    h1 {
+      font-size: 60px;
+    }
 
-        button {
-                display: block;
-                font-family: 'Poppins', 'Lato', 'Segoe UI', sans-serif;
-                margin: 10px 0;
-                padding: 10px;
-                width: 400px;
-                height: 100px;
-                border: 1px solid #ccc;
-                border-radius: 5px;
-                background: #444141;
-                color: white;
-                border: none;
-                cursor: pointer;
-                font-size: 20px;
-            }
-        button:hover {
-                background: #2e302e;
-            }
-        p {
-            font-size: 20px;
-        }
-    </style>
+    h2 {
+      font-size: 35px;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    button {
+      font-family: 'Poppins', 'Lato', 'Segoe UI', sans-serif;
+      padding: 10px;
+      width: 400px;
+      height: 100px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background: #444141;
+      color: white;
+      cursor: pointer;
+      font-size: 20px;
+    }
+
+    button:hover {
+      background: #2e302e;
+    }
+
+    p {
+      font-size: 20px;
+    }
+
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.6);
+    }
+
+    .modal-content {
+      background-color: #fff;
+      margin: 10% auto;
+      padding: 20px;
+      width: 60%;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .close {
+      float: right;
+      font-size: 24px;
+      font-weight: bold;
+      color: #aaa;
+      cursor: pointer;
+    }
+
+    .team-links a {
+      display: block;
+      margin: 10px 0;
+      font-size: 18px;
+      color: #0077b5;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .team-links a:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
 <body>
-    <h1>ShroudX</h1>
-    <h2>Encrypt. Embed. Protect.</h2>
-    <p>Steganography is the practice of concealing information within another message or physical object, making the presence of the hidden information undetectable to an unsuspecting observer. </p>
-<div class="container">
+    <button class="help-button" onclick="document.getElementById('helpModal').style.display='block'">Help</button>
+
+  <h1>ShroudX</h1>
+  <h2>Encrypt. Embed. Protect.</h2>
+  <p>Steganography is the practice of concealing information within another message or physical object, making the presence of the hidden information undetectable to an unsuspecting observer.</p>
+
+  <div class="container">
     <button onclick="location.href='/page1'">Text in Image Steganography</button>
     <button onclick="location.href='/page2'">Text in Text Steganography</button>
     <button onclick="location.href='/page3'">Image in Image Steganography</button>
-    <button onclick="location.href='/page3'">Audio in Image Steganography</button>
-</div>
+    <button onclick="location.href='/page4'">Audio in Image Steganography</button>
+    
+  </div>
+
+  <!-- Help Modal -->
+  <div id="helpModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="document.getElementById('helpModal').style.display='none'">&times;</span>
+      <h3>Meet Our Team</h3>
+      <div class="team-links">
+        <a href="www.linkedin.com/in/sai-sriya-jandhyam-bb13832ab" target="_blank">Jandhyam Sai Sriya – LinkedIn</a>
+        <a href="https://www.linkedin.com/in/member2" target="_blank">Member 2 – LinkedIn</a>
+        <a href="https://www.linkedin.com/in/member3" target="_blank">Member 3 – LinkedIn</a>
+        <a href="https://www.linkedin.com/in/member4" target="_blank">Member 4 – LinkedIn</a>
+        <a href="https://www.linkedin.com/in/member5" target="_blank">Member 5 – LinkedIn</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Close modal when clicking outside of it
+    window.onclick = function(event) {
+      const modal = document.getElementById('helpModal');
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
+  </script>
 </body>
 </html>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Evaluate Steganography Metrics</title>
+    <title>Evaluate Image-in-Image Metrics</title>
     <style>
         body {
             font-family: 'Poppins', 'Lato', 'Segoe UI', sans-serif;
@@ -10,6 +10,11 @@
             background-color: rgb(195, 198, 199);
             margin: 0;
             padding: 20px;
+            background-image: url("{{ url_for('static', filename='background.jpeg') }}");
+                background-size: cover;
+                background-repeat: no-repeat;
+                background-attachment: fixed;
+                background-position: center;
         }
 
         h2 {
@@ -72,7 +77,7 @@
         }
 
         th {
-            background-color: #28a745;
+            background-color: #444141;
             color: white;
             font-size: 18px;
         }
@@ -99,29 +104,37 @@
             font-size: 18px;
             margin-bottom: 10px;
         }
+
+        .error {
+            color: red;
+            margin-top: 15px;
+        }
     </style>
 </head>
 <body>
-    <h2>Evaluate Steganographic Metrics</h2>
+    <h2>Evaluate Image-in-Image Metrics</h2>
 
     <div class="description">
         <h3>What do these metrics mean?</h3>
         <ul>
             <li><strong>PSNR (Peak Signal-to-Noise Ratio):</strong> Measures image quality. Higher is better. Ideal values are typically <strong>above 40 dB</strong>.</li>
-            <li><strong>SSIM (Structural Similarity Index):</strong> Measures similarity between images. Ranges from 0 to 1. Values <strong>closer to 1</strong> indicate better quality.</li>
             <li><strong>Hamming Distance:</strong> Measures the number of bit differences. Lower values indicate more similarity. Ideal value is <strong>close to 0</strong>.</li>
         </ul>
     </div>
 
     <form method="POST" enctype="multipart/form-data">
-        <label>Upload Original Image:</label><br>
+        <label>Upload Original Secret Image:</label><br>
         <input type="file" name="original_image" required><br>
-        <label>Upload Stego Image:</label><br>
+        <label>Upload Decoded Secret Image:</label><br>
         <input type="file" name="stego_image" required><br>
         <button type="submit">Evaluate</button>
+
+        {% if eval_error %}
+            <div class="error">{{ eval_error }}</div>
+        {% endif %}
     </form>
 
-    {% if metrics %}
+    {% if psnr_value is not none and hamming_value is not none %}
     <h3>Evaluation Results</h3>
     <table>
         <tr>
@@ -130,15 +143,11 @@
         </tr>
         <tr>
             <td>PSNR</td>
-            <td>{{ metrics.psnr }} dB</td>
-        </tr>
-        <tr>
-            <td>SSIM</td>
-            <td>{{ metrics.ssim }}</td>
+            <td>{{ psnr_value }} dB</td>
         </tr>
         <tr>
             <td>Hamming Distance</td>
-            <td>{{ metrics.hamming }}</td>
+            <td>{{ hamming_value }}</td>
         </tr>
     </table>
     {% endif %}
