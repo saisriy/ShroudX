@@ -1,52 +1,140 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Steganography Web App</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Lato:wght@300;400;700&family=Segoe+UI&display=swap"
+    rel="stylesheet"
+  />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+  />
+  <title>Main Page</title>
+  <style>
+    body {
+      font-family: 'Poppins', 'Lato', 'Segoe UI', sans-serif;
+      text-align: center;
+      background-color: rgb(195, 198, 199);
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 80px;
+      margin: 2.5px;
+      text-align: center;
+    }
+
+    h2 {
+      font-size: 30px;
+      margin-top: 10px;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 60px;
+      gap: 20px;
+    }
+
+    .header img {
+      max-width: 100px;
+      height: auto;
+      margin-bottom: 80px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    button {
+      display: block;
+      font-family: 'Poppins', 'Lato', 'Segoe UI', sans-serif;
+      margin: 10px 0;
+      padding: 10px;
+      width: 400px;
+      height: 90px;
+      border-radius: 15px;
+      background: #444141;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 20px;
+    }
+
+    button:hover {
+      background: #2e302e;
+    }
+
+    .circle-button {
+      position: absolute;
+      top: 20px;
+      right: 50px;
+      width: 150px;
+      height: 120px;
+      border-radius: 50px;
+      background: #444141;
+      color: white;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+    }
+
+    .circle-button:hover {
+      background: #2e302e;
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.6s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
 </head>
 <body>
-    <h2>Steganography: Hide & Retrieve Text in Images</h2>
+  <div class="container fade-in">
+    <div class="header">
+      <img src="https://cdn-icons-png.flaticon.com/512/9118/9118397.png" alt="Cryptography Icon" />
+      <div>
+        <h1>ShroudX</h1>
+        <h2>Encrypt. Embed. Protect.</h2>
+      </div>
+    </div>
 
-    <h3>Encode Text into Image</h3>
-    <form method="post" enctype="multipart/form-data">
-        <label>Upload Image:</label>
-        <input type="file" name="image" required><br>
-        <label>Upload Text File:</label>
-        <input type="file" name="text" required><br>
-        <button type="submit" name="encode">Encode</button>
-    </form>
-
-    {% if encoded_image_lsb and encoded_image_random %}
-        <h3>Encoded Images:</h3>
-        <p>Normal LSB Method:</p>
-        <img src="{{ encoded_image_lsb }}" width="300"><br>
-        <a href="{{ encoded_image_lsb }}" download>Download Normal LSB Image</a>
-
-        <p>Random LSB Method:</p>
-        <img src="{{ encoded_image_random }}" width="300"><br>
-        <a href="{{ encoded_image_random }}" download>Download Random LSB Image</a>
-    {% endif %}
-
-    <h3>Decode Text from Image</h3>
-    <form method="post" enctype="multipart/form-data">
-        <label>Upload Stego Image:</label>
-        <input type="file" name="stego_image" required><br>
-        <button type="submit" name="decode">Decode</button>
-    </form>
-
-    {% if decoded_text %}
-        <h3>Extracted Text:</h3>
-        <a href="{{ decoded_text }}" download>Download Decoded Text</a>
-    {% endif %}
-
-    <h3>Performace metrics for normal lsb and random lsb</h3>
-
-    {% if metrics %}
-        <h3>Performance Metrics:</h3>
-        <p>PSNR: {{ metrics['psnr'] }} dB</p>
-        <p>SSIM: {{ metrics['ssim'] }}</p>
-        <p>Hamming Distance: {{ metrics['hamming'] }}</p>
-    {% endif %}
+    <button onclick="location.href='/page1'">Text in Image Steganography</button>
+    <button onclick="location.href='/page2'">Text in Text Steganography</button>
+    <button onclick="location.href='/page3'">Image in Image Steganography</button>
+    <button onclick="location.href='/page3'">Audio in Image Steganography</button>
+    <button class="circle-button" onclick="location.href='/page4'">User Manual</button>
+  </div>
 </body>
 </html>
