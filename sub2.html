@@ -81,12 +81,34 @@
         transform: translateY(0);
       }
     }
+    .circle-button {
+      position: absolute;
+      top: 20px;
+      right: 50px;
+      width: 150px;
+      height: 120px;
+      border-radius: 50px;
+      background: #444141;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+    }
+
+    .circle-button:hover {
+      background: #2e302e;
+    }
 
     </style>
 </head>
 <body>
 <div class="container fade-in">
     <h2>AES + Caesar Text-in-Text Steganography</h2>
+    <button class="circle-button" onclick="location.href='/'">Main Page</button>
 
     {% if error_message %}
         <div class="error">{{ error_message }}</div>
