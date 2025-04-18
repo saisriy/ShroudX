@@ -5,6 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Lato:wght@300;400;700&family=Segoe+UI&display=swap" rel="stylesheet">
   <title>Main Page</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Lato:wght@300;400;700&family=Segoe+UI&display=swap"
+    rel="stylesheet"
+  />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+  />
   <style>
     body {
       font-family: 'Poppins', 'Lato', 'Segoe UI', sans-serif;
@@ -23,7 +31,7 @@
   left: 15px;
   width: 35px;
   height: 35px;
-  font-size: 16px;
+  font-size: 11px;
   background-color: #444141;
   color: white;
   border: none;
@@ -38,7 +46,7 @@
 
 
     h1 {
-      font-size: 60px;
+      font-size: 80px;
     }
 
     h2 {
@@ -94,6 +102,52 @@
       border-radius: 10px;
       text-align: center;
     }
+    .circle-button {
+      position: absolute;
+      top: 20px;
+      right: 50px;
+      width: 150px;
+      height: 120px;
+      border-radius: 50px;
+      background: #444141;
+      color: white;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+    }
+
+    .circle-button:hover {
+      background: #2e302e;
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.6s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
     .close {
       float: right;
@@ -101,6 +155,28 @@
       font-weight: bold;
       color: #aaa;
       cursor: pointer;
+    }
+    .header img {
+      max-width: 100px;
+      height: auto;
+      margin-bottom: 80px;
+      animation: float 3s ease-in-out infinite;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 60px;
+      gap: 20px;
+    }
+
+    
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
     }
 
     .team-links a {
@@ -118,17 +194,25 @@
   </style>
 </head>
 <body>
+
+
+    <div class="container fade-in">
+        <div class="header">
+          <img src="https://cdn-icons-png.flaticon.com/512/9118/9118397.png" alt="Cryptography Icon" />
+          <div>
+            <h1>ShroudX</h1>
+            <h2>Encrypt. Embed. Protect.</h2>
+
+          </div></div>
+
     <button class="help-button" onclick="document.getElementById('helpModal').style.display='block'">Help</button>
 
-  <h1>ShroudX</h1>
-  <h2>Encrypt. Embed. Protect.</h2>
-  <p>Steganography is the practice of concealing information within another message or physical object, making the presence of the hidden information undetectable to an unsuspecting observer.</p>
-
-  <div class="container">
+  
     <button onclick="location.href='/page1'">Text in Image Steganography</button>
     <button onclick="location.href='/page2'">Text in Text Steganography</button>
     <button onclick="location.href='/page3'">Image in Image Steganography</button>
     <button onclick="location.href='/page4'">Audio in Image Steganography</button>
+    <button class="circle-button" onclick="location.href='/page5'">User Manual</button>
     
   </div>
 
@@ -139,10 +223,10 @@
       <h3>Meet Our Team</h3>
       <div class="team-links">
         <a href="www.linkedin.com/in/sai-sriya-jandhyam-bb13832ab" target="_blank">Jandhyam Sai Sriya – LinkedIn</a>
-        <a href="https://www.linkedin.com/in/member2" target="_blank">Member 2 – LinkedIn</a>
-        <a href="https://www.linkedin.com/in/member3" target="_blank">Member 3 – LinkedIn</a>
-        <a href="https://www.linkedin.com/in/member4" target="_blank">Member 4 – LinkedIn</a>
-        <a href="https://www.linkedin.com/in/member5" target="_blank">Member 5 – LinkedIn</a>
+        <a href="https://www.linkedin.com/in/jyothsna-vadlamudi-11665b28b?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank">Jyothsna Vdlamudi – LinkedIn</a>
+        <a href="www.linkedin.com/in/manideep-kodakandla-a896952a7" target="_blank">Manideep Kodakandla – LinkedIn</a>
+        <a href="www.linkedin.com/in/mudelli-vivekananda-reddy-21a7bb28a" target="_blank">Vivekananda Mudelli – LinkedIn</a>
+        <a href="https://www.linkedin.com/in/pradeepika-nori-b4167928a" target="_blank">Prdaeepika Nori – LinkedIn</a>
       </div>
     </div>
   </div>
