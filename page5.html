@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShroudX User Manual</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Lato:wght@300;400;700&family=Segoe+UI&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', 'Lato', 'Segoe UI', sans-serif;
+            background-color: rgb(195, 198, 199);
+            margin: 60px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 60px;
+            margin: 0;
+        }
+
+        h3 {
+            font-size: 20px;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 30px;
+            margin: 0;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        section {
+            margin-bottom: 30px;
+        }
+
+        ul, ol {
+            padding-left: 20px;
+        }
+
+        .note, .contact {
+            background: #9db2c5;
+            border-left: 6px solid #476681;
+            padding: 10px;
+            margin-top: 20px;
+        }
+
+        .constraints {
+            background: #cfc2af;
+            border-left: 6px solid #6a655d;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        a {
+            color: #8fbde2;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+<div class="container fade-in">
+    <section>
+        <h1>User Manual</h1>
+        <h3>This manual shall help you guide through how to use this app. Enjoy!</h3>
+        <hr>
+
+        <h2>1. TEXT IN TEXT STEGANOGRAPHY</h2>
+        <p><strong>Purpose:</strong> Hide secret text inside a normal-looking paragraph of text.</p>
+        <ul>
+            <li><strong>To Encode:</strong>
+                <ol>
+                    <li>Select "Text in Text - Encode".</li>
+                    <li>Enter the <em>cover text</em>.</li>
+                    <li>Enter the <em>secret message</em> and give the desired <em>expiry time</em>.</li>
+                    <li>Click "Encode".</li>
+                    <li>Copy and paste the AES Encryption Key to decode.</li>
+                    <li>Copy or download the encoded text.</li>
+                </ol>
+            </li>
+            <li><strong>To Decode:</strong>
+                <ol>
+                    <li>Select "Text in Text - Decode".</li>
+                    <li>Insert the encoded file.</li>
+                    <li>Insert the generated <em>encryption-key</em>.</li>
+                    <li>Click "Decode" to reveal the message.</li>
+                </ol>
+            </li>
+        </ul>
+        <div class="constraints">
+            <strong>Constraints:</strong>
+            <ul>
+                <li>Cover text must be at least twice the length of the secret message.</li>
+                <li>Do not alter or reformat the encoded text.</li>
+                <li>Special characters may be altered or unsupported.</li>
+                <li>Limited to plain English text; avoid emojis or symbols.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section>
+        <h2>2. TEXT IN IMAGE STEGANOGRAPHY</h2>
+        <p><strong>Purpose:</strong> Hide secret text inside an image file.</p>
+        <ul>
+            <li><strong>To Encode:</strong>
+                <ol>
+                    <li>Select "Text in Image - Encode".</li>
+                    <li>Upload an image (JPEG/PNG).</li>
+                    <li>Enter your secret message.</li>
+                    <li>Optionally set an expiry time.</li>
+                    <li>Click "Encode" and download the stego image.</li>
+                </ol>
+            </li>
+            <li><strong>To Decode:</strong>
+                <ol>
+                    <li>Select "Text in Image - Decode".</li>
+                    <li>Upload the stego image.</li>
+                    <li>Click "Decode" to extract the message.</li>
+                </ol>
+            </li>
+        </ul>
+        <div class="constraints">
+            <strong>Constraints:</strong>
+            <ul>
+                <li>Image must be under 5MB and in JPEG/PNG format.</li>
+                <li>Do not compress or edit the image after encoding.</li>
+                <li>Long messages may require higher-resolution images.</li>
+                <li>Expiry time is enforced on decoding, not deletion.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section>
+        <h2>3. IMAGE IN IMAGE STEGANOGRAPHY</h2>
+        <p><strong>Purpose:</strong> Hide one image inside another image.</p>
+        <ul>
+            <li><strong>To Encode:</strong>
+                <ol>
+                    <li>Select "Image in Image - Encode".</li>
+                    <li>Upload the <em>cover image</em>.</li>
+                    <li>Upload the <em>secret image</em>.</li>
+                    <li>Click "Encode" and download the stego image.</li>
+                </ol>
+            </li>
+            <li><strong>To Decode:</strong>
+                <ol>
+                    <li>Select "Image in Image - Decode".</li>
+                    <li>Upload the stego image.</li>
+                    <li>Click "Decode" to reveal the hidden image.</li>
+                </ol>
+            </li>
+        </ul>
+        <div class="constraints">
+            <strong>Constraints:</strong>
+            <ul>
+                <li>Both images must be under 5MB and in the same format (JPEG or PNG).</li>
+                <li>Cover image should be larger than or equal to the secret image in resolution.</li>
+                <li>Do not edit or filter the image after encoding.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section>
+        <h2>4. AUDIO IN IMAGE STEGANOGRAPHY</h2>
+        <p><strong>Purpose:</strong> Hide audio files inside an image.</p>
+        <ul>
+            <li><strong>To Encode:</strong>
+                <ol>
+                    <li>Select "Audio in Image - Encode".</li>
+                    <li>Upload an image file.</li>
+                    <li>Upload a short audio file (MP3/WAV).</li>
+                    <li>Click "Encode" and download the image.</li>
+                </ol>
+            </li>
+            <li><strong>To Decode:</strong>
+                <ol>
+                    <li>Select "Audio in Image - Decode".</li>
+                    <li>Upload the stego image.</li>
+                    <li>Click "Decode" to access the audio.</li>
+                </ol>
+            </li>
+        </ul>
+        <div class="constraints">
+            <strong>Constraints:</strong>
+            <ul>
+                <li>Audio file must be under 1MB in size (MP3/WAV only).</li>
+                <li>Image should be large enough to store audio data (min 800x800 recommended).</li>
+                <li>Encoded images must not be resized or compressed.</li>
+            </ul>
+        </div>
+    </section>
+
+    <div class="note">
+        <h3>Security Notes</h3>
+        <ul>
+            <li>ShroudX does <strong>not</strong> use cloud storage – your data stays private.</li>
+            <li>Set expiry times for time-sensitive messages (e.g., in Text in Image).</li>
+            <li>Do not compress, resize, or edit files after encoding – this may corrupt hidden data.</li>
+        </ul>
+    </div>
+    </div>
+</div>
+</body>
+</html>
