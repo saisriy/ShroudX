@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Lato:wght@300;400;700&family=Segoe+UI&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', 'Lato', 'Segoe UI', sans-serif;
+            text-align: center;
+            background-color: rgb(195, 198, 199);
+            margin: 0;
+            padding: 20px;
+        }
+        h2, h3 {
+            font-family: 'Poppins', 'Lato', 'Segoe UI', sans-serif;
+            color: #333;
+        }
+        .top-right {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        form {
+            background: white;
+            padding: 20px;
+            margin: 20px auto;
+            display: inline-block;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        input, button {
+            font-family: 'Poppins', 'Lato', 'Segoe UI', sans-serif;
+            margin: 10px 0;
+            padding: 10px;
+            width: 80%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background: #444141;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #2e302e;
+        }
+        a {
+            display: inline-block;
+            margin-top: 10px;
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .output-section {
+            font-family: 'Poppins', 'Lato', 'Segoe UI', sans-serif;
+            margin-top: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            display: inline-block;
+        }
+        .error-message {
+            font-family: 'Poppins', 'Lato', 'Segoe UI', sans-serif;
+            color: red;
+            margin-top: 10px;
+        }
+        .fade-in {
+            animation: fadeIn 0.6s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+    </style>
+</head>
+<body>
+<div class="container fade-in">
+    <h2>ZWC Text-in-Text Steganography</h2>
+
+    {% if error_message %}
+        <div class="error">{{ error_message }}</div>
+    {% endif %}
+
+    <!-- ENCODE SECTION -->
+        <h3>Encode Message</h3>
+        <form method="post" enctype="multipart/form-data">
+            <label>Cover Text File:</label><br>
+            <input type="file" name="cover_text" required><br>
+
+            <label>Secret Text File:</label><br>
+            <input type="file" name="secret_file" required><br>
+
+            <label>Expiry Time (in seconds):</label>
+            <input type="number" name="expiry" min="0" required>
+
+            <button type="submit" name="encode">Encode</button>
+        </form>
+
+        {% if form_submitted == "encode" and encryption_key and expiry %}
+    <div id="key-box" class="success key-box">
+        <strong>Encryption Key:</strong> <span id="encryption-key">{{ encryption_key }}</span><br>
+        <p>This key will expire in <span id="countdown">{{ expiry }}</span> seconds.</p>
+    </div>
+    <script>
+        let countdown = {{ expiry }};
+        const countdownEl = document.getElementById("countdown");
+        const keyBox = document.getElementById("key-box");
+
+        const timer = setInterval(() => {
+            countdown--;
+            countdownEl.textContent = countdown;
+
+            if (countdown <= 0) {
+                clearInterval(timer);
+                keyBox.innerHTML = "<strong>Encryption Key has expired.</strong>";
+            }
+        }, 1000);
+    </script>
+{% endif %}
+
+        {% if encoded_output_file %}
+            <p><strong>Encode Time:</strong> {{ embed_time }} seconds</p>
+            <div class="success download-link">
+                <a href="{{ url_for('static', filename='outputs/stego_text.txt') }}" download>Download Encoded Stego File</a>
+            </div>
+        {% endif %}
+
+    <hr>
+
+    <!-- DECODE SECTION -->
+    
+    <div class="section">
+        <h3>Decode Message</h3>
+        <form method="post" enctype="multipart/form-data">
+            <label>Stego Text File:</label>
+            <input type="file" name="stego_file" required><br>
+
+            <label>Secret Key:</label><br>
+            <input type="text" name="secret_key" required><br>
+
+            <button type="submit" name="decode">Decode</button>
+        </form>
+
+        {% if form_submitted == "decode" and decoded_output_file %}
+            <div class="success download-link">
+                <a href="{{ url_for('static', filename='outputs/decoded_message.txt') }}" download>Download Decoded Message</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+</div>
+</body>
+</html>
