@@ -63,6 +63,27 @@
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
             display: inline-block;
         }
+        .circle-button {
+      position: absolute;
+      top: 20px;
+      right: 50px;
+      width: 150px;
+      height: 120px;
+      border-radius: 50px;
+      background: #444141;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+    }
+
+    .circle-button:hover {
+      background: #2e302e;
+    }
         .error-message {
             font-family: 'Poppins', 'Lato', 'Segoe UI', sans-serif;
             color: red;
@@ -80,7 +101,10 @@
     </style>
 </head>
 <body>
+    <button class="circle-button" onclick="location.href='/'">Main Page</button>
+
 <div class="container fade-in">
+    
     <h2>ZWC Text-in-Text Steganography</h2>
 
     {% if error_message %}
@@ -137,6 +161,7 @@
     
     <div class="section">
         <h3>Decode Message</h3>
+        
         <form method="post" enctype="multipart/form-data">
             <label>Stego Text File:</label>
             <input type="file" name="stego_file" required><br>
