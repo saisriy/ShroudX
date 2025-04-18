@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Lato:wght@300;400;700&family=Segoe+UI&display=swap" rel="stylesheet">
+    <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+  />
+    <title>Main Page</title>
+    <style>
+        body {
+                font-family: 'Poppins', 'Lato', 'Segoe UI', sans-serif;
+                text-align: center;
+                background-color: rgb(195, 198, 199);
+                margin: 0;
+            }
+        
+        h1 {
+            font-size: 60px;
+        }
+
+        h2 {
+            font-size: 35px;
+        }
+
+        .container {
+                display: flex;
+                flex-direction: column;
+                align-items: center; /* Center them horizontally */
+                gap: 10px; /* Add spacing between buttons */
+            }
+
+        button {
+                display: block;
+                font-family: 'Poppins', 'Lato', 'Segoe UI', sans-serif;
+                margin: 10px 0;
+                padding: 10px;
+                width: 400px;
+                height: 90px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                background: #444141;
+                color: white;
+                border: none;
+                cursor: pointer;
+                font-size: 20px;
+            }
+        button:hover {
+                background: #2e302e;
+            }
+        p {
+            font-size: 20px;
+        }
+        .fade-in {
+            animation: fadeIn 0.6s ease-in-out;
+        }
+        @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    </style>
+</head>
+<body>
+    <div class="container fade-in">
+    <h2>Text in Text Steganogaphy</h2>
+    <hr>
+    <h3>Browse through the below techniques</h3>
+    <hr>
+    <h3>Steganography using Zero Width Characters can encode upto 250 words. It converts the secret text into zero width characters like word joiner, zero-width no-break space, etc and stores it in the cover text.</h3>
+    <button onclick="location.href='/sub1'">Using Zero Width Characters</button>
+    <h3>Steganogaphy using Caeser Cipher method converts the existing text into it's equivalent letter using a number. It decodes back using the same.</h3>
+    <button onclick="location.href='/sub2'">Using Caeser Cipher method</button>
+</div>
+</body>
+</html>
