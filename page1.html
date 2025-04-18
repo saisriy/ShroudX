@@ -3,6 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Lato:wght@300;400;700&family=Segoe+UI&display=swap" rel="stylesheet">
+    <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+  />
     <title>Steganography Web App</title>
     <style>
         body {
@@ -30,6 +35,29 @@
             color: #222;
             font-size: 28px;
         }
+        .circle-button {
+      position: absolute;
+      top: 20px;
+      left: 50px;
+      width: 150px;
+      height: 120px;
+      border-radius: 50px;
+      background: #444141;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+    }
+
+    .circle-button:hover {
+      background: #2e302e;
+    }
+
+
     
         form {
             background: white;
@@ -147,7 +175,7 @@
     </div>
 
     <h2>Steganography: Hide & Retrieve Text in Images</h2>
-
+    <button class="circle-button" onclick="location.href='/'">Main Page</button>
     <h3>Encode Text into Image</h3>
     <form method="post" enctype="multipart/form-data">
         <label>Upload Image:</label>
