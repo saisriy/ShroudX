@@ -1,3 +1,5 @@
+import time
+
 # -*- coding: utf-8 -*-
 """Imp.ipynb
 
@@ -216,6 +218,8 @@ def DECode_lsb(stego_path, output_path, secret_size,Level) :
 
     REConstruct(secrets,output_path)
 
+
+
 def REConstruct(secret_Image_matrix, output_path) :
     height ,width = secret_Image_matrix[0].shape[:2]
     recombined_image = np.zeros_like(secret_Image_matrix[0])
@@ -239,3 +243,4 @@ def Start_Encode(cover_image_path,secret_image_path,output_image_path) :
     code = ENCode_lsb(cover_image_path,Bitted_Matrix,Binary_Matrix,output_image_path,Level)
     print(code,Level)
     return code,Level
+
